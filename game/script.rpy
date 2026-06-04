@@ -1,7 +1,7 @@
 ﻿# Вы можете расположить сценарий своей игры в этом файле.
 
 # Глобальные переменные и настройки
-define debug = True
+define debug = False
 define config.menu_include_disabled = debug
 define config.rollback_enabled = debug
 define config.default_afm_enable = debug
@@ -22,6 +22,52 @@ style check_style:
     font "fonts/check.ttf"
     size 32
     color "#1ae9db"
+
+# Настраиваем внешний вид текста (размер, цвет, шрифт)
+style death_style:
+    font "fonts/dream.ttf"
+    xalign 0.5
+    size 60
+    color "#ffffff"
+    outlines [ (2, "#000000", 0, 0) ] # Черный контур, чтобы текст читался на любом фоне
+
+init:
+    transform slow_shaking:
+        # 1-й цикл: плавно опускаемся и темнеем за 0.5 сек
+        linear 1.0 yoffset 15 matrixcolor BrightnessMatrix(-0.5)
+        linear 1.0 yoffset -15 matrixcolor BrightnessMatrix(0.0)
+        
+        # 2-й цикл
+        linear 1.0 yoffset 15 matrixcolor BrightnessMatrix(-0.5)
+        linear 1.0 yoffset -15 matrixcolor BrightnessMatrix(0.0)
+
+        # Финал: возвращаем экран в центр за 0.5 сек
+        linear 0.5 yoffset 0 matrixcolor BrightnessMatrix(0.0)
+
+screen dream_text_overlay(dream_text, display_time):
+    # Создаем свою плашку без привязки к системным say_window
+    frame:
+        # Центрируем по горизонтали и опускаем вниз экрана (0.88 — стандартная высота для диалогов)
+        xalign 0.5
+        yalign 0.88
+        
+        # Размеры плашки (можете настроить под свой интерфейс)
+        xminimum 800
+        xmaximum 1200
+        yminimum 150
+        
+        # Делаем плашку полупрозрачной черной (или укажите свой background)
+        background Solid("#000000a0") 
+        padding (20, 20)
+
+        # Выводим сам текст строго по центру нашей плашки
+        text dream_text:
+            xalign 0.5
+            yalign 0.5
+            text_align 0.5
+
+    # Таймер закрытия экрана
+    timer display_time action Return()
 
 # Определение Python типов и функций
 init python:
@@ -66,11 +112,19 @@ init python:
 
     def check_dream(min_value, text):
         if hero.dream > min_value:
+            # Начинаем отображение сна
             renpy.transition(fade)
             renpy.sound.play("audio/fx/dream_fx.mp3") 
+            
+            # Трясем экран
+            renpy.show("black", layer="bottom") 
+            renpy.layer_at_list([slow_shaking], layer='master')
             renpy.say(None, f"{{=dream_style}}{text}{{/=dream_style}}", interact=True)
+            renpy.layer_at_list([], layer='master')
+            renpy.hide("black", layer="master")
+            
+            # Завершаем отображение сна
             renpy.transition(fade)
-            renpy.pause(1.0)
 
 # Персонажи
 define beggar = Character('Нищий', color="#7c9703")
@@ -99,20 +153,25 @@ screen char_stats():
     frame:
         xalign 0.02 # Отступ слева
         yalign 0.1 # Отступ сверху
-        padding (15, 15) # Внутренние отступы рамки
+        padding (20, 20, 20, 20) # Внутренние отступы рамки
         
         vbox:
             spacing 5 # Расстояние между строками
-            text "{color=[hero.color]}{b}[hero.name]{/color}{/b}"
-            text "[hero.prof.value]"
-            text "Орден: [hero.ord_rel]"
-            text "Культ: [hero.cult_rel]"
-            text "Милосердие: [hero.humanity]"
-            text "Разум: [hero.will]"
-            text "Аспект: [hero.aspect]"
-            text "Контроль: [hero.control]"
-            text "Сон: [hero.dream]"
-            text "Статус: [hero.state.value]"
+            text "{color=[hero.color]}[hero.name]{/color}":
+                font "fonts/char.ttf"
+                size 50
+                xalign 0.5
+            text "[hero.prof.value]":
+                font "fonts/char.ttf"
+                xalign 0.5
+            # text "Орден: [hero.ord_rel]"
+            # text "Культ: [hero.cult_rel]"
+            # text "Милосердие: [hero.humanity]"
+            # text "Разум: [hero.will]"
+            # text "Аспект: [hero.aspect]"
+            # text "Контроль: [hero.control]"
+            # text "Сон: [hero.dream]"
+            # text "Статус: [hero.state.value]"
             add [hero.image] zoom 0.25
 
 # Модалка выбора персонажа
@@ -647,14 +706,20 @@ label morvein_from_temple:
     show beggar default at center
     with dissolve
 
+    "Перед вами неожиданно возникает нищий, которого вы видели перед входом в собор. Он резко бросается на тебя с закрытыми глазами и зажатым в руке камнем."
+
     if beggar_flag_help:
-        "Нищий узнает вас"
+        "В последний момент, словно на мнговение узнав тебя, калека в словно замешательстве останавливается. 
+        И через пару секунд падает на землю без сознания."
     else:
-        "Нищий не узнает вас."
+        "Калека бросает в твою голову камень, после чего падает на землю без сознания."
         $ hero.state = STATE.INJURED
+
 
     hide beggar default
     with dissolve
+
+    "Ты с ужасом понимаешь, что это первый раз, когда кто-то из спящих попытался напасть на человека."
 
     show stefan default at center
     with dissolve
@@ -664,26 +729,26 @@ label morvein_from_temple:
             "Отец Стефан не отвечает. Его взгляд прикован к людям вдалеке."
             "По его остекленевшим глазам ты понимаешь: он впервые не знает, что происходит..."
 
-    $ hero.state = STATE.GRAVELY
-
     "КОНЕЦ ПРОЛОГА"
 
-# Настраиваем внешний вид текста (размер, цвет, шрифт)
-style death_text_style:
-    font "fonts/dream.ttf"
-    xalign 0.5
-    size 60
-    color "#ffffff"
-    outlines [ (2, "#000000", 0, 0) ] # Черный контур, чтобы текст читался на любом фоне
+    return
 
-image death_message = Text("ВАШ ПУТЬ ОКОНЧЕН", style="death_text_style")
+image death_message = Text("ВАШ ПУТЬ ОКОНЧЕН", style="death_style")
 
 label hero_died:
     # Скрываем экран с кровью, так как персонаж уже мертв
     hide screen blood_overlay
     hide screen char_stats
-    
+
     scene black with fade 
+    
+    $ renpy.music.queue([], channel='music', clear_queue=True)
+    $ renpy.music.stop(channel='music', fadeout=3)
+    $ renpy.pause(3, hard=True)
+
+    # 2. Включаем звук смерти
+    # Используем канал sound (для разовых эффектов), чтобы музыкальный канал оставался свободным
+    play sound "audio/fx/death.mp3"
 
     # Показываем текст ниже картинки (xalign 0.5 отцентрирует по горизонтали)
     show expression "images/bg/state_dead.png" at Transform(xalign=0.5, yanchor=0.5, ypos=0.40)
@@ -691,6 +756,6 @@ label hero_died:
     
     # Обязательно добавляем паузу, иначе игра сразу закроется!
     # Игрок увидит картинку с текстом и сможет нажать клик для выхода.
-    $ renpy.pause() 
+    $ renpy.pause()
     
     return
