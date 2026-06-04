@@ -1,7 +1,7 @@
 ﻿# Вы можете расположить сценарий своей игры в этом файле.
 
 # Глобальные переменные и настройки
-define debug = False
+define debug = True
 define config.menu_include_disabled = debug
 define config.rollback_enabled = debug
 define config.default_afm_enable = debug
@@ -9,7 +9,9 @@ define quick_menu = False
 default preferences.afm_enable = True
 default preferences.afm_after_click = False
 default preferences.afm_time = 7.0
+define config.log = "log.txt"
 
+# Флаги квестов
 define beggar_flag_help = False
 
 # Стили текста
@@ -72,6 +74,21 @@ screen dream_text_overlay(dream_text, display_time):
 # Определение Python типов и функций
 init python:
     import enum
+
+    config.has_autosave = True
+    config.autosave_on_choice = False
+    config.autosave_on_quit = False
+    config.autosave_frequency = None
+
+    # Убираем системные сочетания клавиш для быстрых сохранений/загрузок
+    config.keymap['quick_save'] = []
+    config.keymap['quick_load'] = []
+
+    def delete_all_saves():
+        """Находит вообще все сделанные сохранения и безвозвратно удаляет их."""
+        # Получаем полный список всех занятых слотов (включая быстрые и авто)
+        for slot in renpy.list_saved_games(fast=True):
+            renpy.unlink_save(slot)
 
     class STATE(enum.Enum):
         HEALTHY = "Здоров"
@@ -145,6 +162,36 @@ image stefan default = im.FactorScale("images/chars/stefan_default.png", 0.6, 0.
 image beggar default = im.FactorScale("images/chars/beggar_default.png", 0.6, 0.6)
 image cultist default = im.FactorScale("images/chars/cultist_default.png", 0.65, 0.7)
 image sleepwalkers default = im.FactorScale("images/chars/sleepwalkers.png", 0.65, 0.7)
+
+# Основное меню
+screen main_menu():
+    tag menu
+
+    # Добавление вашей картинки на фон
+    add "images/bg/main_menu.png" xsize 1920 ysize 1080
+
+    vbox:
+        xpos 0.06
+        ypos 0.4
+        style_prefix "navigation"
+        spacing 15
+        
+        # Заменяем сложную проверку на простую логику.
+        if renpy.newest_slot(r"^\d.+"):
+            # Если такой обычный сейв найден, встроенный экшен Continue загрузит его
+            textbutton _("Продолжить") action Continue(confirm=False)
+        if renpy.list_saved_games(fast=True):
+            textbutton _("Новая игра") action Confirm(
+                _("Вы уверены? Это действие безвозвратно удалит ВСЕ текущие сохранения."), 
+                yes=[Function(delete_all_saves), Start()]
+            )
+        else:
+            textbutton _("Новая игра") action Start()
+        textbutton _("Об игре") action ShowMenu("about")
+        textbutton _("Выход") action Quit(confirm=not main_menu)
+
+    fixed:
+        style_prefix "main_menu"
 
 # Модалка персонажа
 screen char_stats():
@@ -253,20 +300,6 @@ screen char_choice():
                         size 24
                         color "#e0e0e0"
                         outlines [ (2, "#000", 0, 0) ]
-
-screen main_menu():
-    tag menu
-
-    # Добавление вашей картинки на фон
-    add "images/bg/main_menu.png" xsize 1920 ysize 1080
-
-    vbox:
-        xpos 0.04
-        ypos 0.4
-        use navigation
-
-    fixed:
-        style_prefix "main_menu"
     
 transform blood_flash:
     # Задаем начальную прозрачность без привязки к событиям
@@ -279,9 +312,9 @@ transform blood_flash:
 
 screen blood_overlay(hero_instance):    
     if hero_instance.state == STATE.INJURED:
-        add "images/bg/state_gravely.png" alpha 0.5
+        add "images/misc/state_gravely.png" alpha 0.5
     elif hero_instance.state == STATE.GRAVELY:
-        add "images/bg/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
+        add "images/misc/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
         timer 10.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
 
 # Сценарий
@@ -729,13 +762,29 @@ label morvein_from_temple:
             "Отец Стефан не отвечает. Его взгляд прикован к людям вдалеке."
             "По его остекленевшим глазам ты понимаешь: он впервые не знает, что происходит..."
 
-    "КОНЕЦ ПРОЛОГА"
+    jump to_be_continued
+
+label to_be_continued:
+    hide screen blood_overlay
+    hide screen char_stats
+
+    scene black with fade 
+
+    image tbc_message = Text("ПРОДОЛЖЕНИЕ СЛЕДУЕТ", style="death_style")
+
+    show expression "images/misc/hourglass.png" at Transform(xalign=0.5, yanchor=0.5, ypos=0.40)
+    show tbc_message at Transform(xalign=0.5, yanchor=0.5, ypos=0.80)
+
+    $ renpy.take_screenshot()
+    $ renpy.save("1-1", "Конец пролога")
+
+    $ renpy.pause()
 
     return
 
-image death_message = Text("ВАШ ПУТЬ ОКОНЧЕН", style="death_style")
-
 label hero_died:
+    image death_message = Text("ВАШ ПУТЬ ОКОНЧЕН", style="death_style")
+
     # Скрываем экран с кровью, так как персонаж уже мертв
     hide screen blood_overlay
     hide screen char_stats
@@ -751,7 +800,7 @@ label hero_died:
     play sound "audio/fx/death.mp3"
 
     # Показываем текст ниже картинки (xalign 0.5 отцентрирует по горизонтали)
-    show expression "images/bg/state_dead.png" at Transform(xalign=0.5, yanchor=0.5, ypos=0.40)
+    show expression "images/misc/state_dead.png" at Transform(xalign=0.5, yanchor=0.5, ypos=0.40)
     show death_message at Transform(xalign=0.5, yanchor=0.5, ypos=0.80)
     
     # Обязательно добавляем паузу, иначе игра сразу закроется!
