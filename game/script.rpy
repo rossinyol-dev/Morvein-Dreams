@@ -1,6 +1,6 @@
 ﻿# Вы можете расположить сценарий своей игры в этом файле.
 
-# Глобальные переменные и настройки
+# Глобальные настройки
 define debug = True
 define config.menu_include_disabled = debug
 define config.rollback_enabled = debug
@@ -9,7 +9,13 @@ define quick_menu = False
 default preferences.afm_enable = True
 default preferences.afm_after_click = False
 default preferences.afm_time = 7.0
-define config.log = "log.txt"
+
+define config.has_autosave = True
+define config.autosave_on_choice = False
+define config.autosave_on_quit = False
+define config.autosave_frequency = None
+define config.keymap['quick_save'] = []
+define config.keymap['quick_load'] = []
 
 # Флаги квестов
 define beggar_flag_help = False
@@ -46,49 +52,9 @@ init:
         # Финал: возвращаем экран в центр за 0.5 сек
         linear 0.5 yoffset 0 matrixcolor BrightnessMatrix(0.0)
 
-screen dream_text_overlay(dream_text, display_time):
-    # Создаем свою плашку без привязки к системным say_window
-    frame:
-        # Центрируем по горизонтали и опускаем вниз экрана (0.88 — стандартная высота для диалогов)
-        xalign 0.5
-        yalign 0.88
-        
-        # Размеры плашки (можете настроить под свой интерфейс)
-        xminimum 800
-        xmaximum 1200
-        yminimum 150
-        
-        # Делаем плашку полупрозрачной черной (или укажите свой background)
-        background Solid("#000000a0") 
-        padding (20, 20)
-
-        # Выводим сам текст строго по центру нашей плашки
-        text dream_text:
-            xalign 0.5
-            yalign 0.5
-            text_align 0.5
-
-    # Таймер закрытия экрана
-    timer display_time action Return()
-
 # Определение Python типов и функций
 init python:
     import enum
-
-    config.has_autosave = True
-    config.autosave_on_choice = False
-    config.autosave_on_quit = False
-    config.autosave_frequency = None
-
-    # Убираем системные сочетания клавиш для быстрых сохранений/загрузок
-    config.keymap['quick_save'] = []
-    config.keymap['quick_load'] = []
-
-    def delete_all_saves():
-        """Находит вообще все сделанные сохранения и безвозвратно удаляет их."""
-        # Получаем полный список всех занятых слотов (включая быстрые и авто)
-        for slot in renpy.list_saved_games(fast=True):
-            renpy.unlink_save(slot)
 
     class STATE(enum.Enum):
         HEALTHY = "Здоров"
@@ -114,6 +80,10 @@ init python:
             self.image = image
             self.color = color
             self.dream = dream
+
+    def delete_all_saves():
+        for slot in renpy.list_saved_games(fast=True):
+            renpy.unlink_save(slot)
 
     def passive_check(stat, min_value, text, altText, addDream):
         if(stat) >= min_value:
@@ -158,10 +128,20 @@ image temple_hospital = im.Scale("bg/temple_hospital.png", 1920, 1200)
 image morvein_from_temple = im.Scale("bg/morvein_from_temple.png", 1920, 1200)
 
 # Картинки персонажей
-image stefan default = im.FactorScale("images/chars/stefan_default.png", 0.6, 0.6)
-image beggar default = im.FactorScale("images/chars/beggar_default.png", 0.6, 0.6)
-image cultist default = im.FactorScale("images/chars/cultist_default.png", 0.65, 0.7)
-image sleepwalkers default = im.FactorScale("images/chars/sleepwalkers.png", 0.65, 0.7)
+image stefan default = Transform("images/chars/stefan_default.png", zoom=0.6)
+image beggar default = Transform("images/chars/beggar_default.png", zoom=0.6)
+image cultist default = Transform("images/chars/cultist_default.png", xzoom=0.65, yzoom=0.7)
+image sleepwalkers default = Transform("images/chars/sleepwalkers.png", xzoom=0.65, yzoom=0.7)
+
+# Кровавое мигание
+transform blood_flash:
+    # Задаем начальную прозрачность без привязки к событиям
+    alpha 1.0 
+    # Бесконечный цикл мигания
+    block:
+        linear 1.0 alpha 0.3  # За полсекунды затухает до 30%
+        linear 1.0 alpha 1.0  # За полсекунды возвращается к 100%
+        repeat
 
 # Основное меню
 screen main_menu():
@@ -178,7 +158,6 @@ screen main_menu():
         
         # Заменяем сложную проверку на простую логику.
         if renpy.newest_slot(r"^\d.+"):
-            # Если такой обычный сейв найден, встроенный экшен Continue загрузит его
             textbutton _("Продолжить") action Continue(confirm=False)
         if renpy.list_saved_games(fast=True):
             textbutton _("Новая игра") action Confirm(
@@ -192,6 +171,32 @@ screen main_menu():
 
     fixed:
         style_prefix "main_menu"
+
+# Оверлей сна
+screen dream_text_overlay(dream_text, display_time):
+    # Создаем свою плашку без привязки к системным say_window
+    frame:
+        # Центрируем по горизонтали и опускаем вниз экрана (0.88 — стандартная высота для диалогов)
+        xalign 0.5
+        yalign 0.88
+        
+        # Размеры плашки (можете настроить под свой интерфейс)
+        xminimum 800
+        xmaximum 1200
+        yminimum 150
+        
+        # Делаем плашку полупрозрачной черной (или укажите свой background)
+        background Solid("#000000a0") 
+        padding (20, 20)
+
+        # Выводим сам текст строго по центру нашей плашки
+        text dream_text:
+            xalign 0.5
+            yalign 0.5
+            text_align 0.5
+
+    # Таймер закрытия экрана
+    timer display_time action Return()
 
 # Модалка персонажа
 screen char_stats():
@@ -211,14 +216,15 @@ screen char_stats():
             text "[hero.prof.value]":
                 font "fonts/char.ttf"
                 xalign 0.5
-            # text "Орден: [hero.ord_rel]"
-            # text "Культ: [hero.cult_rel]"
-            # text "Милосердие: [hero.humanity]"
-            # text "Разум: [hero.will]"
-            # text "Аспект: [hero.aspect]"
-            # text "Контроль: [hero.control]"
-            # text "Сон: [hero.dream]"
-            # text "Статус: [hero.state.value]"
+            if debug:
+                text "Орден: [hero.ord_rel]"
+                text "Культ: [hero.cult_rel]"
+                text "Милосердие: [hero.humanity]"
+                text "Разум: [hero.will]"
+                text "Аспект: [hero.aspect]"
+                text "Контроль: [hero.control]"
+                text "Сон: [hero.dream]"
+                text "Статус: [hero.state.value]"
             add [hero.image] zoom 0.25
 
 # Модалка выбора персонажа
@@ -300,16 +306,8 @@ screen char_choice():
                         size 24
                         color "#e0e0e0"
                         outlines [ (2, "#000", 0, 0) ]
-    
-transform blood_flash:
-    # Задаем начальную прозрачность без привязки к событиям
-    alpha 1.0 
-    # Бесконечный цикл мигания
-    block:
-        linear 1.0 alpha 0.3  # За полсекунды затухает до 30%
-        linear 1.0 alpha 1.0  # За полсекунды возвращается к 100%
-        repeat
 
+# Оверлей ранения    
 screen blood_overlay(hero_instance):    
     if hero_instance.state == STATE.INJURED:
         add "images/misc/state_gravely.png" alpha 0.5
@@ -513,7 +511,7 @@ label temple_inside:
     scene temple_inside
     with fade
 
-    play music "<from 51.0>audio/temple.mp3" fadein 3.0
+    play music "<from 52.0>audio/temple.mp3" fadein 3.0
 
     "Внутри собора почти темно. Высокие своды теряются где-то наверху, за дымом свечей и тенями."
     "Шаги звучат непривычно глухо, будто камень под ногами поглощает эхо."
@@ -709,8 +707,8 @@ label awakening_temple:
     "По его лицу видно, что он пытается хоть как-то контролировать происходящее, 
     но лунатики продолжают возникать в разных частях собора и каждый раз обходят препятствия, будто заранее знают, где их встретят."
 
-    "Несколько братьев опрокидывают тяжелые деревянные скамьи поперек центрального нефа, превратив их в подобие баррикады. 
-    Однако лунатики не останавливаются — они медленно перелезают через препятствия или сворачивают в боковые проходы, 
+    "Несколько братьев опрокидывают тяжелые деревянные скамьи поперек центрального нефа, превратив их в подобие баррикады."
+    "Однако лунатики не останавливаются — они медленно перелезают через препятствия или сворачивают в боковые проходы, 
     продолжая двигаться к выходу с пугающим упорством."
 
     "Ты видишь, что у главных ворот, несмотря на приказ отца Стефана, царит неразбериха."
@@ -739,7 +737,8 @@ label morvein_from_temple:
     show beggar default at center
     with dissolve
 
-    "Перед вами неожиданно возникает нищий, которого вы видели перед входом в собор. Он резко бросается на тебя с закрытыми глазами и зажатым в руке камнем."
+    "Перед вами неожиданно возникает нищий, которого вы видели перед входом в собор. 
+    Он резко кидается на тебя с закрытыми глазами и зажатым в руке камнем."
 
     if beggar_flag_help:
         "В последний момент, словно на мнговение узнав тебя, калека в словно замешательстве останавливается. 
@@ -747,7 +746,6 @@ label morvein_from_temple:
     else:
         "Калека бросает в твою голову камень, после чего падает на землю без сознания."
         $ hero.state = STATE.INJURED
-
 
     hide beggar default
     with dissolve
@@ -762,9 +760,9 @@ label morvein_from_temple:
             "Отец Стефан не отвечает. Его взгляд прикован к людям вдалеке."
             "По его остекленевшим глазам ты понимаешь: он впервые не знает, что происходит..."
 
-    jump to_be_continued
+    jump prologue_end
 
-label to_be_continued:
+label prologue_end:
     hide screen blood_overlay
     hide screen char_stats
 
@@ -779,6 +777,13 @@ label to_be_continued:
     $ renpy.save("1-1", "Конец пролога")
 
     $ renpy.pause()
+
+    jump act_1_start
+
+label act_1_start:
+    scene morvein_from_temple
+
+    "..."
 
     return
 
