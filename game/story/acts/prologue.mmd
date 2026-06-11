@@ -2,25 +2,22 @@ flowchart TD
 
 START[Старт игры] --> B{Выбор класса}
 
-B -->|Доктор Фальк| C1[Доктор Фальк]
-B -->|Монах Мильтон| C2[Монах Мильтон]
+B -->|Доктор Фальк| D 
+B -->|Монах Мильтон| D
 
-C1 --> D[Путь в собор]
-C2 --> D
-
+D[Путь в собор]
 D --> E[Встреча с нищим]
 
 E --> F{Класс?}
 
-F -->|Монах| G1[Проходит мимо нищего]
+F -->|Монах| G1[Пройти мимо]
 F -->|Доктор| H{Дать монетку?}
 
-H -->|Монетка| G2[Дать монетку]
-H -->|Игнор| G3[Пройти мимо]
+H -->|Дать монетку| G2[Нищий запоминает вас]
+H -->|Игнор| G1[Пройти мимо]
 
 G1 --> I[Вход в собор]
 G2 --> I
-G3 --> I
 
 I --> J{hero.dream > 0?}
 
@@ -65,7 +62,7 @@ class K dream
 
 classDef act fill:#ffcc99,stroke:#cc6600,stroke-width:4px,color:#000
 classDef condition fill:#ffcccc,stroke:#cc0000,stroke-width:3px,color:#000
-classDef neutral fill:#fff2b2,stroke:#b38f00,stroke-width:3px,color:#000
-classDef dream fill:#800080,stroke:#000,stroke-width:3px,color:#000
+classDef neutral fill:#fff2b2,stroke:#b38f00,stroke-width:2px,color:#000
+classDef dream fill:#800080,stroke:#000,stroke-width:2px,color:#000
 
 linkStyle default stroke-width:4px

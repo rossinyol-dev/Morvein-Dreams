@@ -1,16 +1,15 @@
 ﻿# Вы можете расположить сценарий своей игры в этом файле.
 
 # Глобальные настройки
-define debug = True
+define debug = False
 define config.menu_include_disabled = debug
 define config.rollback_enabled = debug
 define config.default_afm_enable = debug
-define quick_menu = False
-default preferences.afm_enable = True
-default preferences.afm_after_click = False
-default preferences.afm_time = 7.0
+define quick_menu = debug
+default preferences.afm_enable = debug
+default preferences.afm_after_click = debug
 
-define config.has_autosave = True
+define config.has_autosave = False
 define config.autosave_on_choice = False
 define config.autosave_on_quit = False
 define config.autosave_frequency = None
@@ -20,301 +19,6 @@ define config.keymap['quick_load'] = []
 # Флаги квестов
 define beggar_flag_help = False
 
-# Стили текста
-style dream_style:
-    font "fonts/dream.ttf"
-    size 32
-    color "#8f12c5"
-
-style check_style:
-    font "fonts/check.ttf"
-    size 32
-    color "#1ae9db"
-
-# Настраиваем внешний вид текста (размер, цвет, шрифт)
-style death_style:
-    font "fonts/dream.ttf"
-    xalign 0.5
-    size 60
-    color "#ffffff"
-    outlines [ (2, "#000000", 0, 0) ] # Черный контур, чтобы текст читался на любом фоне
-
-init:
-    transform slow_shaking:
-        # 1-й цикл: плавно опускаемся и темнеем за 0.5 сек
-        linear 1.0 yoffset 15 matrixcolor BrightnessMatrix(-0.5)
-        linear 1.0 yoffset -15 matrixcolor BrightnessMatrix(0.0)
-        
-        # 2-й цикл
-        linear 1.0 yoffset 15 matrixcolor BrightnessMatrix(-0.5)
-        linear 1.0 yoffset -15 matrixcolor BrightnessMatrix(0.0)
-
-        # Финал: возвращаем экран в центр за 0.5 сек
-        linear 0.5 yoffset 0 matrixcolor BrightnessMatrix(0.0)
-
-# Определение Python типов и функций
-init python:
-    import enum
-
-    class STATE(enum.Enum):
-        HEALTHY = "Здоров"
-        INJURED = "Ранен"
-        GRAVELY = "Умирает"
-        DEAD = "Мертв"
-
-    class PROF(enum.Enum):
-        DOCTOR = "Доктор"
-        MONK = "Монах"
-
-    class Hero:
-        def __init__(self, name, prof, state, humanity, will, aspect, control, dream, ord_rel, cult_rel, image, color):
-            self.name = name
-            self.prof = prof
-            self.state = state
-            self.humanity = humanity
-            self.will = will
-            self.aspect = aspect
-            self.control = control
-            self.ord_rel = ord_rel
-            self.cult_rel = cult_rel
-            self.image = image
-            self.color = color
-            self.dream = dream
-
-    def delete_all_saves():
-        for slot in renpy.list_saved_games(fast=True):
-            renpy.unlink_save(slot)
-
-    def passive_check(stat, min_value, text, altText, addDream):
-        if(stat) >= min_value:
-            renpy.sound.play("audio/fx/dream_fx.mp3") 
-
-    def add_stat(hero_object, stat_name, value):
-        # Получаем текущее значение свойства
-        current_value = getattr(hero_object, stat_name)
-        # Записываем новое измененное значение
-        setattr(hero_object, stat_name, current_value + value)
-        # Воспроизводим звук
-        renpy.sound.play("audio/fx/pass_fx.mp3")
-
-    def check_dream(min_value, text):
-        if hero.dream > min_value:
-            # Начинаем отображение сна
-            renpy.transition(fade)
-            renpy.sound.play("audio/fx/dream_fx.mp3") 
-            
-            # Трясем экран
-            renpy.show("black", layer="bottom") 
-            renpy.layer_at_list([slow_shaking], layer='master')
-            renpy.say(None, f"{{=dream_style}}{text}{{/=dream_style}}", interact=True)
-            renpy.layer_at_list([], layer='master')
-            renpy.hide("black", layer="master")
-            
-            # Завершаем отображение сна
-            renpy.transition(fade)
-
-# Персонажи
-define beggar = Character('Нищий', color="#7c9703")
-define stefan = Character('Отец Стефан', color="#b02d2d")
-define cultist = Character('Культист', color="#6a4001")
-            
-# Картинки фонов
-image morvein_start = im.Scale("bg/morvein_start.png", 1920, 1080)
-image morvein_streets = im.Scale("bg/morvein_streets.png", 1920, 1080)
-image temple_inside = im.Scale("bg/temple_inside.png", 1920, 1080)
-image temple_outside = im.Scale("bg/temple_outside.png", 1920, 1080)
-image temple_interrogation_room = im.Scale("bg/temple_interrogation_room.png", 1920, 1200)
-image temple_hospital = im.Scale("bg/temple_hospital.png", 1920, 1200)
-image morvein_from_temple = im.Scale("bg/morvein_from_temple.png", 1920, 1200)
-
-# Картинки персонажей
-image stefan default = Transform("images/chars/stefan_default.png", zoom=0.6)
-image beggar default = Transform("images/chars/beggar_default.png", zoom=0.6)
-image cultist default = Transform("images/chars/cultist_default.png", xzoom=0.65, yzoom=0.7)
-image sleepwalkers default = Transform("images/chars/sleepwalkers.png", xzoom=0.65, yzoom=0.7)
-
-# Кровавое мигание
-transform blood_flash:
-    # Задаем начальную прозрачность без привязки к событиям
-    alpha 1.0 
-    # Бесконечный цикл мигания
-    block:
-        linear 1.0 alpha 0.3  # За полсекунды затухает до 30%
-        linear 1.0 alpha 1.0  # За полсекунды возвращается к 100%
-        repeat
-
-# Основное меню
-screen main_menu():
-    tag menu
-
-    # Добавление вашей картинки на фон
-    add "images/bg/main_menu.png" xsize 1920 ysize 1080
-
-    vbox:
-        xpos 0.06
-        ypos 0.4
-        style_prefix "navigation"
-        spacing 15
-        
-        # Заменяем сложную проверку на простую логику.
-        if renpy.newest_slot(r"^\d.+"):
-            textbutton _("Продолжить") action Continue(confirm=False)
-        if renpy.list_saved_games(fast=True):
-            textbutton _("Новая игра") action Confirm(
-                _("Вы уверены? Это действие безвозвратно удалит ВСЕ текущие сохранения."), 
-                yes=[Function(delete_all_saves), Start()]
-            )
-        else:
-            textbutton _("Новая игра") action Start()
-        textbutton _("Об игре") action ShowMenu("about")
-        textbutton _("Выход") action Quit(confirm=not main_menu)
-
-    fixed:
-        style_prefix "main_menu"
-
-# Оверлей сна
-screen dream_text_overlay(dream_text, display_time):
-    # Создаем свою плашку без привязки к системным say_window
-    frame:
-        # Центрируем по горизонтали и опускаем вниз экрана (0.88 — стандартная высота для диалогов)
-        xalign 0.5
-        yalign 0.88
-        
-        # Размеры плашки (можете настроить под свой интерфейс)
-        xminimum 800
-        xmaximum 1200
-        yminimum 150
-        
-        # Делаем плашку полупрозрачной черной (или укажите свой background)
-        background Solid("#000000a0") 
-        padding (20, 20)
-
-        # Выводим сам текст строго по центру нашей плашки
-        text dream_text:
-            xalign 0.5
-            yalign 0.5
-            text_align 0.5
-
-    # Таймер закрытия экрана
-    timer display_time action Return()
-
-# Модалка персонажа
-screen char_stats():
-    zorder 100 # Поверх остальных элементов (чтобы не перекрывался диалоговым окном)
-    
-    frame:
-        xalign 0.02 # Отступ слева
-        yalign 0.1 # Отступ сверху
-        padding (20, 20, 20, 20) # Внутренние отступы рамки
-        
-        vbox:
-            spacing 5 # Расстояние между строками
-            text "{color=[hero.color]}[hero.name]{/color}":
-                font "fonts/char.ttf"
-                size 50
-                xalign 0.5
-            text "[hero.prof.value]":
-                font "fonts/char.ttf"
-                xalign 0.5
-            if debug:
-                text "Орден: [hero.ord_rel]"
-                text "Культ: [hero.cult_rel]"
-                text "Милосердие: [hero.humanity]"
-                text "Разум: [hero.will]"
-                text "Аспект: [hero.aspect]"
-                text "Контроль: [hero.control]"
-                text "Сон: [hero.dream]"
-                text "Статус: [hero.state.value]"
-            add [hero.image] zoom 0.25
-
-# Модалка выбора персонажа
-screen char_choice():
-    modal True
-    add "#00000080"
-
-    # Переменная для отслеживания наведения (0 - никто, 1 - Мильтон, 2 - Фальк)
-    default hovered_char = 0
-
-    grid 2 1:
-        xfill True
-        yfill True
-        spacing 0
-
-        # --- ЛЕВАЯ ПОЛОВИНА (Мильтон) ---
-        fixed:
-            imagebutton:
-                xsize 0.5         # Занимает ровно 50% ширины экрана
-                ysize 1.0         # Занимает 100% высоты экрана
-                auto "chars/hero_milton_%s.png"
-                
-                yoffset -80
-                xoffset -80
-
-                hovered SetScreenVariable("hovered_char", 1)
-                unhovered SetScreenVariable("hovered_char", 0)
-                action Return("choice_1")
-
-            # Блок текста для Мильтона
-            if hovered_char == 1:
-                vbox:
-                    align (0.5, 0.9)      # Центрируем весь блок внутри левой половины
-                    # Ограничиваем ширину текста, чтобы он не упирался в края (минус отступы 50px с двух сторон)
-                    # Если экран 1920x1080, то половина — это 960. Делаем блок шириной 860.
-                    xsize 0.9             # Занимает 90% от ширины своей половины экрана
-                    spacing 15            # Промежуток между элементами (заменяет пустую строку)
-
-                    text "Мильтон":
-                        xalign 0.5        # Имя строго по центру блока
-                        size 40           # Крупный шрифт для имени
-                        color "#fff"
-                        outlines [ (2, "#000", 0, 0) ]
-
-                    text "Бывший монах Ордена. Служил в храме Морвейна много лет, прежде чем покинуть его. Годы служения сделали его черствым к людским слабостям, а увиденные странности стали проникать в его сновидения.":
-                        xalign 0.0        # Описание начинается слева
-                        text_align 0.0    # Выравнивание строк длинного текста по левому краю
-                        size 24           # Шрифт для описания чуть меньше
-                        color "#e0e0e0"
-                        outlines [ (2, "#000", 0, 0) ]
-
-        # --- ПРАВАЯ ПОЛОВИНА (Фальк) ---
-        fixed:
-            imagebutton:
-                xsize 0.5         # Занимает ровно 50% ширины экрана
-                ysize 1.0         # Занимает 100% высоты экрана
-                auto "chars/hero_falk_%s.png"
-                
-                hovered SetScreenVariable("hovered_char", 2)
-                unhovered SetScreenVariable("hovered_char", 0)
-                action Return("choice_2")
-
-            # Блок текста для Фалька
-            if hovered_char == 2:
-                vbox:
-                    align (0.5, 0.9)      # Центрируем весь блок внутри правой половины
-                    xsize 0.9             # Занимает 90% от ширины своей половины экрана
-                    spacing 15            # Промежуток между элементами (заменяет пустую строку)
-
-                    text "Фальк":
-                        xalign 0.5        # Имя строго по центру блока
-                        size 40
-                        color "#fff"
-                        outlines [ (2, "#000", 0, 0) ]
-
-                    text "Блестящий столичный лекарь. Попал в немилость из-за смерти влиятельного горожанина. Оказался в Морвейне совсем недавно, но уже заслужил уважение местных. Милосерден и крайне рационален, в происходящем в Морвейне пытается найти научное объяснение.":
-                        xalign 0.0        # Описание начинается слева
-                        text_align 0.0    # Выравнивание строк длинного текста по левому краю
-                        size 24
-                        color "#e0e0e0"
-                        outlines [ (2, "#000", 0, 0) ]
-
-# Оверлей ранения    
-screen blood_overlay(hero_instance):    
-    if hero_instance.state == STATE.INJURED:
-        add "images/misc/state_gravely.png" alpha 0.5
-    elif hero_instance.state == STATE.GRAVELY:
-        add "images/misc/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
-        timer 10.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
-
 # Сценарий
 label start:
     $ quick_menu = debug
@@ -323,8 +27,7 @@ label start:
     $ preferences.afm_enable = not debug
     $ preferences.afm_time = 10.0
 
-    scene morvein_start
-    with fade
+    scene morvein_start with fade
 
     play music "audio/main_theme.m4a"
 
@@ -409,8 +112,7 @@ label start:
             jump morvein_streets
 
 label morvein_streets:
-    scene morvein_streets
-    with fade
+    scene morvein_streets with fade
 
     "Чем глубже ты заходишь в город, тем больше удушливое чувство всеобщего страха проникает в тебя."
     "Люди стараются не задерживаться на улицах. Некоторые, заметив твой взгляд, сразу опускают голову."
@@ -440,8 +142,7 @@ label morvein_streets:
     jump temple_outside   
 
 label temple_outside:
-    scene temple_outside
-    with fade
+    scene temple_outside with fade
 
     "Собор Ордена возвышается над Морвейном,
     словно исполинский часовой.
@@ -508,8 +209,7 @@ label temple_outside:
     jump temple_inside
 
 label temple_inside:
-    scene temple_inside
-    with fade
+    scene temple_inside with fade
 
     play music "<from 52.0>audio/temple.mp3" fadein 3.0
 
@@ -529,8 +229,6 @@ label temple_inside:
 
     "Где-то в глубине собора слышится негромкое и монотонное пение. 
     Несколько голосов повторяют одну и ту же фразу снова и снова, словно убаюкивают ребенка."
-
-    $ check_dream(1, "На одно короткое мгновение тебе кажется, будто пол под ногами едва заметно дрожит. Или даже дышит...")
 
     show stefan default at center
     with dissolve
@@ -625,9 +323,7 @@ label temple_interrogation_room:
     jump awakening_temple
 
 label temple_hospital:
-    scene temple_hospital
-
-    with fade
+    scene temple_hospital with fade
 
     "Пока отец Стефан медленно спускается по лестнице в комнату для допросов, один из служителей проводит тебя в храмовую лечебницу."
 
@@ -653,7 +349,7 @@ label temple_hospital:
     jump awakening_temple
 
 label awakening_temple:
-    scene temple_inside
+    scene temple_inside with fade
 
     play music "<from 147.0>audio/epic_theme.m4a"
 
@@ -723,10 +419,9 @@ label awakening_temple:
 
 label morvein_from_temple:
     scene morvein_from_temple 
-
     with fade
 
-    hide sleepwalkers default
+    hide sleepwalkers default 
     with dissolve
 
     "Вы с отцом Стефаном выбегаете на широкую площадку перед собором и замираете."
@@ -747,12 +442,12 @@ label morvein_from_temple:
         "Калека бросает в твою голову камень, после чего падает на землю без сознания."
         $ hero.state = STATE.INJURED
 
-    hide beggar default
+    hide beggar default 
     with dissolve
 
     "Ты с ужасом понимаешь, что это первый раз, когда кто-то из спящих попытался напасть на человека."
 
-    show stefan default at center
+    show stefan default at center 
     with dissolve
 
     menu:
@@ -763,10 +458,10 @@ label morvein_from_temple:
     jump prologue_end
 
 label prologue_end:
-    hide screen blood_overlay
-    hide screen char_stats
+    scene black 
+    with fade 
 
-    scene black with fade 
+    hide screen gui
 
     image tbc_message = Text("ПРОДОЛЖЕНИЕ СЛЕДУЕТ", style="death_style")
 
@@ -778,38 +473,191 @@ label prologue_end:
 
     $ renpy.pause()
 
+    jump act_1_hospital_before_start
+
+label act_1_hospital_before_start:
+    scene bed_view 
+    with fade
+
+    play music "hospital.mp3" fadein 3.0
+
+    $ hero.state = STATE.HEALTHY
+
+    "Ты открываешь глаза и несколько секунд смотришь в деревянный потолок. 
+    В голове шумит, а каждый вдох отзывается тупой болью в голове."
+    "Помещение кажется тебе смутно знакомым. Спустя несколько секунд ты понимаешь, что находишься в храмовой лечебнице."
+    "У дальней стены стоит человек в монашеской рясе. Заметив движение, он откладывает книгу и поднимается на ноги."
+    
+    show mattias default at center 
+    with dissolve
+
+    mattias "О, соня, ты снова с нами."
+    mattias "Я брат Маттиас, присматриваю за этой лечебницей."
+    mattias "И за тобой, пока ты не поправишься."
+
+    "Ты видишь легкую улыбку на его лице, которая кажется неуместной в такой обстановке, но выглядит очень искренней."
+
+    menu:
+        "Сколько я уже здесь? И что с отцом Стефаном?":
+            mattias "К счастью, твои раны оказались не слишком серьезными. Через несколько дней ты уже полностью поправишься."
+            "Выражение лица Маттиаса мрачнеет."
+            mattias "Что касается отца Маттиаса - он жив. Но травма очень тяжелая, мы боремся за его жизнь все это время.
+            Орден не может позволить себе потерять такого человека, как он."
+            mattias "Всеми делами сейчас временно управляет совет Ордена."
+    
+    if hero.prof == PROF.DOCTOR:
+        menu:
+            "Совет Ордена?":
+                mattias "Да, это группа старших братьев, которые принимают решения в отсутствие отца Стефана."
+
+    mattias "Им пришлось действовать быстро и решительно, чтобы навести порядок после произошедшего."
+    mattias "Все выходы из города сейчас закрыты, а на улицах введен комендантский час."
+    mattias "А сейчас — отдыхай. Продолжим наш разговор позднее."
+
+    hide mattias default at center 
+    with dissolve
+
+    call dream_scene(
+    [
+        "Ты слышишь колокола",
+        "Они звучат все ближе.",
+    ],
+    [
+        "Они уже ушли.",
+        "Ты ещё можешь их догнать...",
+        "Нет, ты не сможешь!",
+        "Ты опоздал...",
+        "Когда настанет час - бойся Прилива!"
+    ],
+    False)
+    
+    show mattias default at center 
+    with dissolve
+
+    "Брат Маттиас встревоженно подбегает к тебе."
+
+    mattias "Что случилось?"
+    mattias "Твои крики были слышны на весь собор."
+
+    "Ты рассказываешь брату Маттиасу об увиденном тобой кошмаре."
+    "При воспоминании об отце Стефане с его белыми зрачками и жуткой ухмылкой по твоему телу бежит холодная дрожь."
+    if(hero.prof == PROF.MONK):
+        "В твоей памяти всплывают жуткие сны, которые ты уже видел когда-то в стенах Собора."
+    elif(hero.prof == PROF.DOCTOR):
+        "Никогда в своей жизни ты не видел таких жутких снов."
+    "Монах ободряюще берет тебя за руку."
+
+    mattias "В последнее время люди видят кошмары все чаще..."
+    "Отец Маттас протягивает тебе пузырек с искрящейся желтой жидкостью."
+    mattias "Вот, возьми."
+    mattias "Если ужасы начнут одолевать тебя, то выпей это зелье."
+    if(hero.prof == PROF.MONK):
+        mattias "Сам знаешь, как Орден дорожит этими эликсирами."
+    elif(hero.prof == PROF.DOCTOR):
+        mattias "Используй его с умом. Орден обычно не раздает эти эликсиры никому, кроме самих братьев."
+    mattias "Такими темпами придется раздавать их всем жителям города..."
+    "В воздухе повисает долгое молчание, сопровождаемое лишь неровным дыханием твоего собеседника."
+    "Ты чувствуешь, что сознание снова начинает покидать тебя."
+    "Маттиас, заметив это, беззвучно отступает от кровати и выходит за дверь."
+    "Последнее, что ты слышишь перед погружением в сон, это звук удаляющихся шагов..."
+
+    hide mattias default
+    with dissolve
+
+    with long_fade
+    
+    "Проснувшись снова, ты чувствуешь, что силы вернулись к тебе."
+    "Голова всё ещё слегка кружится, но кошмар отступил, оставив после себя лишь смутное беспокойство."
+    "Некоторое время ты лежишь неподвижно, глядя в потолок лечебницы."
+    "Поднявшись на ноги спустя время, ты замечаешь, что за окном уже давно рассвело. Пора действовать."
+
+    scene temple_inside 
+    with fade
+
+    "Собор сильно изменился за время, пока ты спал."
+    "Повсюду снуют братья Ордена с книгами и ветхими свитками в руках."
+    "Помещение наводнили храмовые стражи, которых ты никогда не видел до этого в таком количестве."
+    "Становится очевидным: уклад жизни города изменился навсегда."
+    "Слишком многое произошло без твоего участия. Слишком многое осталось без ответов."
+    "И настало время узнать правду."
+
+    $ renpy.take_screenshot()
+    $ renpy.save("1-2", "Начало 1 акта")
+
     jump act_1_start
 
 label act_1_start:
-    scene morvein_from_temple
+    scene temple_inside
+    with long_fade
 
-    "..."
+    $ inventory_items = [
+        InvItem("coins", "Золото", "images/misc/coins.png", "Золотая марка Морвейна. Причина людского раздора во все времена.", 300),
+        InvItem("potion_hp", "Зелье исцеления", "images/misc/potion.png", "Колба с мерцающей красной жидкостью внутри. Исцеляет даже самые тяжелые раны.", 1),
+        InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_energy.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 1),
+    ]
+
+    menu optional_name:
+        "Начать собственное наследование":
+            jump act_1_own_investigation_start
+        "Обратиться к совету Ордена за помощью" if hero.ord_rel >= 2:
+            jump act_2_order_investigation_start
+
+label act_1_own_investigation_start:
+    scene morvein_streets
+    with fade
+
+    "Собственное расследование..."
 
     return
 
-label hero_died:
-    image death_message = Text("ВАШ ПУТЬ ОКОНЧЕН", style="death_style")
+label act_2_order_investigation_start:
+    scene temple_inside
+    with fade
 
-    # Скрываем экран с кровью, так как персонаж уже мертв
-    hide screen blood_overlay
+    "Помощь Ордена..."
+
+    return
+
+label dream_scene(texts_start, texts_horror = [], texts_end = [], show_gui_after = True):
+    hide screen gui
+    with fade
+
     hide screen char_stats
-
-    scene black with fade 
+    with fade
     
-    $ renpy.music.queue([], channel='music', clear_queue=True)
-    $ renpy.music.stop(channel='music', fadeout=3)
-    $ renpy.pause(3, hard=True)
+    $ start_dream_effect()
 
-    # 2. Включаем звук смерти
-    # Используем канал sound (для разовых эффектов), чтобы музыкальный канал оставался свободным
-    play sound "audio/fx/death.mp3"
+    $ old_skip = preferences.skip_unseen
+    $ preferences.skip_unseen = False
 
-    # Показываем текст ниже картинки (xalign 0.5 отцентрирует по горизонтали)
-    show expression "images/misc/state_dead.png" at Transform(xalign=0.5, yanchor=0.5, ypos=0.40)
-    show death_message at Transform(xalign=0.5, yanchor=0.5, ypos=0.80)
+    with long_fade
+
+    python:
+        for text in texts_start:
+            dream(text)
+            renpy.pause(2.0, hard=True)
+
+    if texts_horror:
+        show stefan horror with dissolve
+        python:
+            for text in texts_horror:
+                horror(text)
+                renpy.pause(2.0, hard=True)
+        hide stefan horror with long_fade
+
+    if texts_end:
+        python:
+            for text in texts_end:
+                dream(text)
+                renpy.pause(2.0, hard=True)
+
+    with long_fade
+
+    if show_gui_after:
+        show screen gui (hero)
+        with fade
+
+    $ stop_dream_effect()
+
+    $ preferences.skip_unseen = old_skip
     
-    # Обязательно добавляем паузу, иначе игра сразу закроется!
-    # Игрок увидит картинку с текстом и сможет нажать клик для выхода.
-    $ renpy.pause()
-    
-    return
