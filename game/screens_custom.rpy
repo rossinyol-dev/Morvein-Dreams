@@ -10,6 +10,10 @@ default inventory_items = []
 default isDebuffed = False
 define long_fade = Fade(2.0, 0.5, 2.0)
 
+# ============
+# МЕНЮ
+# ============
+
 # Основное меню
 screen main_menu():
     tag menu
@@ -39,6 +43,107 @@ screen main_menu():
     fixed:
         style_prefix "main_menu"
 
+# ============
+# GUI
+# ============
+
+# Кнопка журнала
+screen journal_button():
+    modal False
+
+    fixed:
+        xysize (100, 100)
+
+        add Transform(
+            "images/misc/journal.png",
+            zoom=0.20,
+            alpha=1.0,
+            matrixcolor=TintMatrix("#ff4800")
+        ):
+            align (0.5, 0.5)
+
+        imagebutton:
+            idle Transform("images/misc/journal.png", zoom=0.18, alpha=0.9)
+            hover Transform("images/misc/journal.png", zoom=0.20, alpha=1.0)
+
+            align (0.5, 0.5)
+            action Show("journal_overlay")
+
+# Кнопка персонажа
+screen char_button:
+    modal False
+
+    fixed:
+        xysize (100, 100)
+
+        add Transform(
+            "images/misc/helmet.png",
+            zoom=0.20,
+            alpha=1.0,
+            matrixcolor=TintMatrix("#ff4800")
+        ):
+            align (0.5, 0.5)
+
+        imagebutton:
+            idle Transform("images/misc/helmet.png", zoom=0.18, alpha=0.9)
+            hover Transform("images/misc/helmet.png", zoom=0.20, alpha=1.0)
+
+            align (0.5, 0.5)
+            action Show("char_stats")
+
+# Кнопка инвентаря
+screen inventory_button():
+    modal False
+
+    fixed:
+        xysize (100, 100)
+
+        add Transform(
+            "images/misc/inventory.png",
+            zoom=0.20,
+            alpha=1.0,
+            matrixcolor=TintMatrix("#ff4800")
+        ):
+            align (0.5, 0.5)
+
+        imagebutton:
+            idle Transform("images/misc/inventory.png", zoom=0.18, alpha=0.9)
+            hover Transform("images/misc/inventory.png", zoom=0.20, alpha=1.0)
+
+            align (0.5, 0.5)
+            action Show("inventory_overlay")
+
+# HUD
+screen hud():
+    zorder 100 # Поверх остальных элементов (чтобы не перекрывался диалоговым окном)
+    
+    add Solid("#00000000") 
+
+    frame:
+        background None
+
+        xalign 0.9 # Отступ слева
+        yalign 0.05 # Отступ сверху
+        
+        hbox:
+            spacing 100
+            use char_button
+            use journal_button
+            use inventory_button
+        
+# GUI
+screen gui:
+    use blood_overlay(hero)
+    use hud
+
+# ============
+# Модалки
+# ============
+
+# ============
+# Оверлеи
+# ============
+
 # Оверлей сна
 screen dream_text_overlay(dream_text, display_time):
     # Создаем свою плашку без привязки к системным say_window
@@ -65,34 +170,51 @@ screen dream_text_overlay(dream_text, display_time):
     # Таймер закрытия экрана
     timer display_time action Return()
 
+# Оверлей ранения    
+screen blood_overlay(hero_instance):    
+    if hero_instance.state == STATE.INJURED:
+        add "images/misc/state_gravely.png" alpha 0.5
+    elif hero_instance.state == STATE.GRAVELY:
+        add "images/misc/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
+        timer 10.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
+        # $ debuff_stats(hero_instance)
+
+########
+
 # Модалка персонажа
 screen char_stats():
-    zorder 100 # Поверх остальных элементов (чтобы не перекрывался диалоговым окном)
-    
-    frame:
-        xalign 0.02 # Отступ слева
-        yalign 0.1 # Отступ сверху
-        padding (20, 20, 20, 20) # Внутренние отступы рамки
-        
-        vbox:
-            spacing 5 # Расстояние между строками
-            text "{color=[hero.color]}[hero.name]{/color}":
-                font "fonts/char.ttf"
-                size 50
-                xalign 0.5
-            text "[hero.prof.value]":
-                font "fonts/char.ttf"
-                xalign 0.5
-            if debug:
-                text "Орден: [hero.ord_rel]"
-                text "Культ: [hero.cult_rel]"
-                text "Милосердие: [hero.humanity]"
-                text "Разум: [hero.will]"
-                text "Аспект: [hero.aspect]"
-                text "Контроль: [hero.control]"
-                text "Сон: [hero.dream]"
-                text "Статус: [hero.state.value]"
-            add [hero.image] zoom 0.25
+    modal True
+    zorder 100
+
+    add Solid("#000000AA")
+
+    fixed:
+        align (0.5, 0.5)
+        xysize (1920, 1080)
+        add "images/misc/char_inside.png"
+   
+        hbox:
+            add [hero.image]:
+                zoom 0.5
+            vbox:
+                align (0.75, 0.1)
+                spacing 50
+                style_prefix ("char_page_text")
+                vbox:
+                    spacing 40
+                    text "{color=[hero.color]}[hero.name]{/color}"
+                    text "[hero.prof.value]"
+                vbox:
+                    spacing 20
+                    text "[stat_desc(hero.humanity, mercy_desc, mercy_colors)]"
+                    text "[stat_desc(hero.will, reason_desc, reason_colors)]"
+                    text "[stat_desc(hero.aspect, aspect_desc, aspect_colors)]"
+                    text "[stat_desc(hero.control, control_desc, control_colors)]"
+            imagebutton:
+                align (0.99, 0.01)
+                idle Transform("images/misc/exit.png", zoom=0.18, alpha=0.7)
+                hover Transform("images/misc/exit.png", zoom=0.18, alpha=1.0)
+                action Hide("char_stats")
 
 # Модалка выбора персонажа
 screen char_choice():
@@ -174,38 +296,6 @@ screen char_choice():
                         color "#e0e0e0"
                         outlines [ (2, "#000", 0, 0) ]
 
-# Оверлей ранения    
-screen blood_overlay(hero_instance):    
-    if hero_instance.state == STATE.INJURED:
-        add "images/misc/state_gravely.png" alpha 0.5
-    elif hero_instance.state == STATE.GRAVELY:
-        $ debuff_stats(hero_instance)
-        add "images/misc/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
-        timer 10.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
-
-# Кнопка инвентаря
-screen inventory_button():
-    modal False
-
-    fixed:
-        align (0.00, 0.6)
-        xysize (320, 240)
-
-        add Transform(
-            "images/misc/inventory.png",
-            zoom=0.27,
-            alpha=1.0,
-            matrixcolor=TintMatrix("#ff4800")
-        ):
-            align (0.5, 0.5)
-
-        imagebutton:
-            idle Transform("images/misc/inventory.png", zoom=0.25, alpha=0.9)
-            hover Transform("images/misc/inventory.png", zoom=0.27, alpha=1.0)
-
-            align (0.5, 0.5)
-            action Show("inventory_overlay")
-
 # Экран инвентаря
 screen inventory_overlay():
     # Делаем экран модальным, чтобы КЛИКИ МИМО инвентаря НЕ листали диалог,
@@ -217,7 +307,7 @@ screen inventory_overlay():
 
     fixed:
         align (0.5, 0.5)
-        xysize (1100, 1100)
+        xysize (1080, 1080)
 
         add "images/misc/inventory_inside.png"
 
@@ -290,52 +380,6 @@ screen item_description(item, item_x, item_y):
                 size 30
                 color "#e6d2aa"
                 xmaximum 360
-
-# Кнопка журнала
-screen journal_button():
-    modal False
-
-    fixed:
-        align (0.11, 0.6)
-        xysize (320, 240)
-
-        add Transform(
-            "images/misc/journal.png",
-            zoom=0.27,
-            alpha=1.0,
-            matrixcolor=TintMatrix("#ff4800")
-        ):
-            align (0.5, 0.5)
-
-        imagebutton:
-            idle Transform("images/misc/journal.png", zoom=0.25, alpha=0.9)
-            hover Transform("images/misc/journal.png", zoom=0.28, alpha=1.0)
-
-            align (0.5, 0.5)
-            action Show("journal_overlay")
-
-# Кнопка целебного зелья
-screen potion_button:
-    modal False
-
-    fixed:
-        align (0.11, 0.7)
-        xysize (320, 240)
-
-        add Transform(
-            "images/misc/potion.png",
-            zoom=0.27,
-            alpha=1.0,
-            matrixcolor=TintMatrix("#ff4800")
-        ):
-            align (0.5, 0.5)
-
-        imagebutton:
-            idle Transform("images/misc/potion.png", zoom=0.25, alpha=0.9)
-            hover Transform("images/misc/potion.png", zoom=0.28, alpha=1.0)
-
-            align (0.5, 0.5)
-            action Show("potion_overlay")
 
 # Журнал
 screen journal_overlay():
@@ -432,35 +476,7 @@ screen note_editor(note):
         
         key "K_ESCAPE" action Hide("note_editor")
 
-# Эффект зелья
-screen potion_overlay():
-    on "show" action SetField(hero, "state", STATE.GRAVELY)
-
-    # Таймер на 3 секунды, который сработает один раз
-    timer 3.0 action [
-        SetField(hero, "state", STATE.HEALTHY), # Возвращаем здоровье
-        Hide("potion_overlay")                  # Прячем экран автоматически
-    ]
-
-# Модалка персонажа
-screen rpg_overlay():
-    zorder 100 # Поверх остальных элементов (чтобы не перекрывался диалоговым окном)
-    
-    add Solid("#00000000") 
-
-    frame:
-        background None
-
-        xalign 0.98 # Отступ слева
-        yalign 0.05 # Отступ сверху
-        padding (20, 20, 20, 20) # Внутренние отступы рамки
-        
-        vbox:
-            use journal_button
-            use inventory_button
-            use potion_button
-
-# Экран смертиы
+# Экран смерти
 label hero_died:
     image death_message = Text("ВАШ ПУТЬ ОКОНЧЕН", style="death_style")
 
@@ -487,8 +503,3 @@ label hero_died:
     
     return
 
-# GUI
-screen gui:
-    use blood_overlay(hero)
-    use char_stats
-    use rpg_overlay

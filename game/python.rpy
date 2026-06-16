@@ -1,8 +1,74 @@
+define aspect_colors = [
+    "#2c1332", # 0-2
+    "#4d1f5a", # 3-4
+    "#6f2b84", # 5-6
+    "#9440b0", # 7-8
+    "#cc00ff", # 9-10
+]
+
+define mercy_colors = [
+    "#7A6A45",
+    "#9A8050",
+    "#C9A96A",
+    "#E0C27A",
+    "#F2D98A",
+]
+
+define reason_colors = [
+    "#4E6475",
+    "#63839B",
+    "#7FA7C9",
+    "#9BC4E6",
+    "#B8DFFF",
+]
+
+define control_colors = [
+    "#566B52",
+    "#6F8A68",
+    "#8FAE8B",
+    "#A8C9A3",
+    "#C2E0BC",
+]
+
 # Определение Python типов и функций
 init python:
     import enum
     import pygame_sdl2 as pygame
     import random
+    import re
+    import time
+
+    GREEK_MAP = {
+        "а": "α",
+        "е": "ε",
+        "з": "ζ",
+        "и": "ι",
+        "к": "κ",
+        "м": "μ",
+        "н": "η",
+        "о": "ο",
+        "р": "ρ",
+        "с": "ς",
+        "т": "τ",
+        "у": "υ",
+        "ф": "φ",
+        "х": "χ",
+
+        "А": "Α",
+        "Е": "Ε",
+        "З": "Ζ",
+        "И": "Ι",
+        "К": "Κ",
+        "М": "Μ",
+        "Н": "Η",
+        "О": "Ο",
+        "Р": "Ρ",
+        "С": "Σ",
+        "Т": "Τ",
+        "У": "Υ",
+        "Ф": "Φ",
+        "Х": "Χ",
+    }
 
     class STATE(enum.Enum):
         HEALTHY = "Здоров"
@@ -15,19 +81,20 @@ init python:
         MONK = "Монах"
 
     class Hero:
-        def __init__(self, name, prof, state, humanity, will, aspect, control, dream, ord_rel, cult_rel, image, color):
+        def __init__(self, name, full_name, prof, state, humanity, will, aspect, control, dream, ord_rel, cult_rel, image, color):
             self.name = name
+            self.full_name = full_name
             self.prof = prof
             self.state = state
             self.humanity = humanity
             self.will = will
             self.aspect = aspect
             self.control = control
+            self.dream = dream
             self.ord_rel = ord_rel
             self.cult_rel = cult_rel
             self.image = image
             self.color = color
-            self.dream = dream
 
     class Note(object):
         def __init__(self, note_id, title, text=""):
@@ -124,31 +191,203 @@ init python:
             # Завершаем отображение сна
             renpy.transition(fade)
 
-    def dream_glitch(text, level):
-        if level < 3:
+    def hard_fade(scene_name, delay=3.0, texts = None):
+        renpy.stop_skipping()
+
+        renpy.hide_screen("say")
+        renpy.hide_screen("quick_menu")
+        renpy.hide_screen("gui")
+
+        renpy.scene(layer="screens")
+        renpy.scene(layer="overlay")
+
+        renpy.scene(layer="master")
+        renpy.show("black", layer="master")
+        renpy.with_statement(None)
+
+        if texts:
+            renpy.say(None, texts)
+
+        renpy.pause(0.5, hard=True)
+
+        renpy.show(scene_name, layer="master", at_list=[fade_in_from_black(delay)])
+        renpy.pause(delay, hard=True)
+            
+
+    dream_active = True
+
+    def dreamify(text):
+        if hero_selected:
+            parts = re.split(r'(\{.*?\})', text)
+            result = []
+            chance = 0.2 + (hero.dream - 3) * 0.1
+
+            for part in parts:
+                if part.startswith("{") and part.endswith("}"):
+                    result.append(part)
+                    continue
+
+                transformed = []
+
+                for char in part:
+                    if char in GREEK_MAP and random.random() < chance:
+                        transformed.append(
+                            "{color=#9b59ff}{i}" +
+                            "{shader=jitter:u__jitter=1.0,1.0}" +
+                            GREEK_MAP[char] +
+                            "{/shader}" +
+                            "{/i}{/color}"
+                        )
+                    else:
+                        transformed.append(char)
+
+                result.append("".join(transformed))
+
+            return "".join(result)
+        else:
             return text
 
-        chars = list(text)
-        symbols = [
-            "☽", 
-            "☾",
-            "✧", 
-            "✦",
-            "◈",
-            "⊙",
-            "∅",
-            "ꙮ",
-            "⸸",
-            "◌",
-            "🜄",
-        ]
+    def dream_char(image_name, pos=None, z=10, transition=dissolve):
+        if pos is None:
+            pos = []
 
-        chance = 0.03 * level
+        low_dream_level=3
 
-        for i, ch in enumerate(chars):
-            if ch != " " and random.random() < chance:
-                chars[i] = random.choice(symbols)
+        if hero.dream >= low_dream_level:
+            renpy.show(
+                image_name,
+                tag=image_name.split()[0] + "_shadow",
+                at_list=pos + [dream_shadow],
+                zorder=z - 1
+            )
 
-        return "".join(chars)
+        renpy.show(
+            image_name,
+            at_list=pos,
+            zorder=z
+        )
 
+        renpy.transition(transition)
+
+
+    old_say = renpy.say
+
+    def dream_say(who, what, *args, **kwargs):
+        if dream_active:
+            what = dreamify(what)
+
+        return old_say(who, what, *args, **kwargs)
+
+    renpy.say = dream_say
+
+    dream_alpha = 0.8
+    def dream_scene_dynamic(st, at, image_name):
+        global dream_alpha
+
+        dream_alpha += random.uniform(-0.05, 0.05)
+        dream_alpha = max(0.4, min(0.6, dream_alpha))
+
+        d = Composite(
+            (1920, 1080),
+            (0, 0), renpy.displayable(image_name),
+            (0, 0), Transform(
+                renpy.displayable(image_name + "_dream"),
+                alpha=dream_alpha
+            )
+        )
+
+        return d, 0.1
+
+    def stat_desc(value, text_table, color_table):
+        if value <= 2:
+            idx = 0
+        elif value <= 4:
+            idx = 1
+        elif value <= 6:
+            idx = 2
+        elif value <= 8:
+            idx = 3
+        else:
+            idx = 4
+
+        return "{color=%s}%s{/color}" % (color_table[idx], text_table[idx])
+
+
+    mercy_desc = [
+        "Чужая боль тебя почти не трогает.",
+        "Ты стараешься помогать людям, когда можешь.",
+        "Ты остро переживаешь чужие страдания.",
+        "Ради других ты готов жертвовать собственным благополучием.",
+        "Чужая судьба для тебя почти так же важна, как собственная."
+    ]
+
+    reason_desc = [
+        "Ты всё чаще упускаешь важные детали.",
+        "Ты замечаешь больше, чем большинство людей.",
+        "Ты начинаешь видеть закономерности там, где другие видят случайности.",
+        "Немногие способны скрыть что-либо от твоего взгляда.",
+        "Ты видишь связи, недоступные большинству людей."
+    ]
+
+    aspect_desc = [
+        "Сны проходят мимо тебя, не оставляя следа.",
+        "Иногда тебе кажется, что мир говорит с тобой.",
+        "Сны оставляют след даже после пробуждения.",
+        "Граница между сном и явью становится тоньше.",
+        "Что-то по ту сторону сна начинает замечать тебя в ответ."
+    ]
+
+    control_desc = [
+        "Эмоции всё чаще берут верх над рассудком.",
+        "Ты ещё способен держать себя в руках.",
+        "Даже под давлением ты сохраняешь ясность мысли.",
+        "Твой разум остаётся непоколебим даже перед лицом ужаса.",
+        "Ты полностью владеешь собой и своими страхами."
+    ]
+
+    # def start_glitch_loop(normal_track, reverse_track):
+    #     renpy.music.play(normal_track, channel='music')
+        
+    #     state = {
+    #         'last_switch': time.time(),
+    #         'current_track': normal_track,
+    #         'is_reversed': False,
+    #         'next_interval': random.uniform(4.0, 7.0)
+    #     }
+        
+    #     if 'glitch_loop' in globals():
+    #         try: config.periodic_callbacks.remove(glitch_loop)
+    #         except: pass
+            
+    #     def glitch_loop():
+    #         if not renpy.music.get_playing(channel='music'):
+    #             config.periodic_callbacks.remove(glitch_loop)
+    #             return
+
+    #         if time.time() - state['last_switch'] >= state['next_interval']:
+    #             current_pos = renpy.music.get_pos(channel='music') or 0.0
+                
+    #             state['is_reversed'] = not state['is_reversed']
+    #             state['current_track'] = reverse_track if state['is_reversed'] else normal_track
+                
+    #             glitch_file = "<from {}>{}".format(current_pos, state['current_track'])
+                
+    #             # fadeout=0.5 — плавно тушит текущий трек за 0.5 сек
+    #             # fadein=0.5 — плавно включает новый трек за 0.5 сек
+    #             renpy.music.play(glitch_file, channel='music', fadeout=3.0, fadein=3.0, tight=True)
+                
+    #             state['last_switch'] = time.time()
+    #             state['next_interval'] = random.uniform(8.0, 10.0)
+                
+    #     globals()['glitch_loop'] = glitch_loop
+    #     config.periodic_callbacks.append(glitch_loop)
+
+    # def stop_glitch_loop():
+    #     if 'glitch_loop' in globals():
+    #         try:
+    #             config.periodic_callbacks.remove(glitch_loop)
+    #             del globals()['glitch_loop']
+    #         except:
+    #             pass
+    #     renpy.music.stop(channel='music')
 

@@ -1,7 +1,7 @@
 ﻿# Вы можете расположить сценарий своей игры в этом файле.
 
 # Глобальные настройки
-define debug = False
+define debug = True
 define config.menu_include_disabled = debug
 define config.rollback_enabled = debug
 define config.default_afm_enable = debug
@@ -15,9 +15,15 @@ define config.autosave_on_quit = False
 define config.autosave_frequency = None
 define config.keymap['quick_save'] = []
 define config.keymap['quick_load'] = []
+define config.default_textshader = "typewriter"
 
-# Флаги квестов
+# Флаги истории
+define hero_selected = False
+
+# Флаги квестов и прогресса
 define beggar_flag_help = False
+define agatha_release_flag = False
+define council_help_flag = False
 
 # Сценарий
 label start:
@@ -27,9 +33,9 @@ label start:
     $ preferences.afm_enable = not debug
     $ preferences.afm_time = 10.0
 
-    scene morvein_start with fade
-
     play music "audio/main_theme.m4a"
+
+    $ hard_fade("morvein_start", 3.0)
 
     "Дождь шел уже шестой день подряд.
     Морвейн всегда пах одинаково: мокрым камнем, 
@@ -57,28 +63,49 @@ label start:
 
     # Обрабатываем выбор героя
     if result == "choice_1":
-        $ hero = Hero("Мильтон", PROF.MONK, STATE.HEALTHY, 0, 2, 5, 5, 3, 3, 0, "images/chars/hero_milton_idle.png", "#f00")
+        $ hero = Hero(
+            name = "Мильтон", 
+            full_name = "брат Мильтон", 
+            prof = PROF.MONK, 
+            state = STATE.HEALTHY, 
+            humanity = 2, 
+            will = 4, 
+            aspect = 7, 
+            control = 7, 
+            dream = 3, 
+            ord_rel = 3, 
+            cult_rel = 0, 
+            image="images/chars/hero_milton_idle.png", 
+            color="#f00")
         
-        show screen char_stats
-
         "Когда-то ты уже жил в Морвейне.
         Годы спустя ты почти убедил себя,
         что детские молитвы,
         доносящиеся из-под собора,
         были лишь кошмаром.
         Но прошлой ночью ты снова услышал их во сне."
-
     elif result == "choice_2":
-        $ hero = Hero("Фальк", PROF.DOCTOR, STATE.HEALTHY, 4, 4, 2, 2, 0, 0, 0, "images/chars/hero_falk_idle.png", "#593ed0")
-
-        show screen char_stats
+        $ hero = Hero(
+            name = "Фальк", 
+            full_name = "доктор Фальк", 
+            prof = PROF.DOCTOR, 
+            state = STATE.HEALTHY, 
+            humanity = 7, 
+            will = 7, 
+            aspect = 2, 
+            control = 4, 
+            dream = 0, 
+            ord_rel = 0, 
+            cult_rel = 0, 
+            image = "images/chars/hero_falk_idle.png", 
+            color="#593ed0")
 
         "Первого пациента привели к тебе четыре дня назад.
         Мальчик не просыпался двое суток.
         Во сне он неустанно повторял одно слово на неизвестном языке."
         "Через день он исчез из палаты."
 
-    show screen blood_overlay(hero)
+    $ hero_selected = True
 
     "Морвейн никогда не засыпал.
     По крайней мере,
@@ -112,7 +139,8 @@ label start:
             jump morvein_streets
 
 label morvein_streets:
-    scene morvein_streets with fade
+    scene morvein_streets_mix
+    with fade
 
     "Чем глубже ты заходишь в город, тем больше удушливое чувство всеобщего страха проникает в тебя."
     "Люди стараются не задерживаться на улицах. Некоторые, заметив твой взгляд, сразу опускают голову."
@@ -184,7 +212,9 @@ label temple_outside:
 
     "Когда ты проходишь мимо, то он обращает на тебя свой полуслепой взгляд, устремленный куда-то вдаль."
 
-    show beggar default at center
+    show beggar default:
+        xalign 0.5
+        yalign 1.0
     with dissolve
 
     if hero.prof == PROF.MONK:
@@ -316,6 +346,9 @@ label temple_interrogation_room:
 
     stefan "Довольно!"
     "Отец Стефан делает резкий шаг по направлению к узнику с поднятой рукой, явно намереваясь заставить его замолчать."
+
+    stop music fadeout 7.0
+
     "Неожиданно звуки хора наверху резко смолкают. В возникшей тишине слышно лишь нервное дыхание пленника и удары капель дождя о купол собора."
     "По лицу отца Стефана становится понятно, что такого прежде не происходило."
     stefan "Наверх, быстро!"
@@ -349,16 +382,10 @@ label temple_hospital:
     jump awakening_temple
 
 label awakening_temple:
-    scene temple_inside with fade
-
-    play music "<from 147.0>audio/epic_theme.m4a"
-
     if hero.prof == PROF.MONK:
-        "Вы быстро поднимаетесь по лестнице обратно к главному залу.
-        С каждой ступенькой чувство тревоги накатывает на вас все сильнее."
+        play music "<from 147.0>audio/epic_theme.m4a"
 
-        "Навстречу вам выбегает молодой послушник, его белое лицо перекошено от страха:
-        \n— Отец Стефан, мы не можем их остановить!"
+        $ hard_fade("temple_inside", 3.0, "Вы быстро поднимаетесь по лестнице обратно к главному залу. С каждой ступенькой чувство тревоги накатывает на вас все сильнее.")
 
         show sleepwalkers default at center
         with dissolve
@@ -373,6 +400,10 @@ label awakening_temple:
         show stefan default at center
         with dissolve
     else:
+        play music "<from 147.0>audio/epic_theme.m4a"
+
+        $ hard_fade("temple_inside", 3.0)
+
         show sleepwalkers default at center
         with dissolve
 
@@ -424,36 +455,40 @@ label morvein_from_temple:
     hide sleepwalkers default 
     with dissolve
 
+    show stefan default at center 
+    with dissolve
+
     "Вы с отцом Стефаном выбегаете на широкую площадку перед собором и замираете."
     "Отсюда весь Морвейн лежит как на ладони: лабиринт тесных улиц, крыши, теряющиеся в тумане, и редкие огни в окнах."
     "По всему городу двигаются люди — десятки, а может быть, сотни фигур медленно выходят из домов, переулков и дворов, 
     сливаясь в длинные безмолвные потоки"
 
+    menu:
+        "Что нам делать?":
+            "Отец Стефан не отвечает. Его взгляд прикован к людям вдалеке."
+            "По его остекленевшим глазам ты понимаешь: он впервые не знает, что происходит..."
+
+    hide stefan default
+    with dissolve
     show beggar default at center
     with dissolve
 
     "Перед вами неожиданно возникает нищий, которого вы видели перед входом в собор. 
-    Он резко кидается на тебя с закрытыми глазами и зажатым в руке камнем."
+    Он резко кидается в вашу сторону с закрытыми глазами и зажатым в руке камнем."
 
     if beggar_flag_help:
         "В последний момент, словно на мнговение узнав тебя, калека в словно замешательстве останавливается. 
         И через пару секунд падает на землю без сознания."
     else:
         "Калека бросает в твою голову камень, после чего падает на землю без сознания."
+        show screen blood_overlay(hero)
         $ hero.state = STATE.INJURED
+        "Ты с ужасом понимаешь, что это первый раз, когда кто-то из спящих попытался напасть на человека."
+        $ hard_fade("black", 3.0)
+
 
     hide beggar default 
     with dissolve
-
-    "Ты с ужасом понимаешь, что это первый раз, когда кто-то из спящих попытался напасть на человека."
-
-    show stefan default at center 
-    with dissolve
-
-    menu:
-        "Что нам делать?":
-            "Отец Стефан не отвечает. Его взгляд прикован к людям вдалеке."
-            "По его остекленевшим глазам ты понимаешь: он впервые не знает, что происходит..."
 
     jump prologue_end
 
@@ -471,27 +506,28 @@ label prologue_end:
     $ renpy.take_screenshot()
     $ renpy.save("1-1", "Конец пролога")
 
+
     $ renpy.pause()
 
     jump act_1_hospital_before_start
 
-label act_1_hospital_before_start:
-    scene bed_view 
-    with fade
 
+label act_1_hospital_before_start:
     play music "hospital.mp3" fadein 3.0
+
+    $ hard_fade("bed_view", 3.0)
 
     $ hero.state = STATE.HEALTHY
 
-    "Ты открываешь глаза и несколько секунд смотришь в деревянный потолок. 
+    narrator "Ты открываешь глаза и несколько секунд смотришь в деревянный потолок. 
     В голове шумит, а каждый вдох отзывается тупой болью в голове."
     "Помещение кажется тебе смутно знакомым. Спустя несколько секунд ты понимаешь, что находишься в храмовой лечебнице."
-    "У дальней стены стоит человек в монашеской рясе. Заметив движение, он откладывает книгу и поднимается на ноги."
+    "Справа от тебя сидит незнакомый человек в монашеской рясе. Заметив движение, он откладывает книгу и поднимается на ноги."
     
     show mattias default at center 
     with dissolve
 
-    mattias "О, соня, ты снова с нами."
+    mattias "О, ты снова с нами, соня"
     mattias "Я брат Маттиас, присматриваю за этой лечебницей."
     mattias "И за тобой, пока ты не поправишься."
 
@@ -499,10 +535,11 @@ label act_1_hospital_before_start:
 
     menu:
         "Сколько я уже здесь? И что с отцом Стефаном?":
-            mattias "К счастью, твои раны оказались не слишком серьезными. Через несколько дней ты уже полностью поправишься."
-            "Выражение лица Маттиаса мрачнеет."
-            mattias "Что касается отца Маттиаса - он жив. Но травма очень тяжелая, мы боремся за его жизнь все это время.
-            Орден не может позволить себе потерять такого человека, как он."
+            mattias "Ты здесь уже пару дней. К счастью, твои раны оказались не слишком серьезными. 
+                Через несколько дней ты уже полностью поправишься."
+            narrator "Выражение лица Маттиаса мрачнеет."
+            mattias "Что касается отца Cтефана — он жив. Но травма очень тяжелая, мы боремся за его жизнь все это время.
+                Орден не может позволить себе потерять такого человека, как он."
             mattias "Всеми делами сейчас временно управляет совет Ордена."
     
     if hero.prof == PROF.DOCTOR:
@@ -511,7 +548,10 @@ label act_1_hospital_before_start:
                 mattias "Да, это группа старших братьев, которые принимают решения в отсутствие отца Стефана."
 
     mattias "Им пришлось действовать быстро и решительно, чтобы навести порядок после произошедшего."
+    mattias "Сотни людей бесследно исчезли этой ночью."
     mattias "Все выходы из города сейчас закрыты, а на улицах введен комендантский час."
+    mattias "И еще одно."
+    mattias "Совет хочет встретится с тобой. Ведь ты последний, кто видел отца Стефана в сознании."
     mattias "А сейчас — отдыхай. Продолжим наш разговор позднее."
 
     hide mattias default at center 
@@ -519,13 +559,13 @@ label act_1_hospital_before_start:
 
     call dream_scene(
     [
-        "Ты слышишь колокола",
-        "Они звучат все ближе.",
+        "Ты слышишь колокола и шум прибоя...",
+        "Они звучат все ближе...",
     ],
     [
         "Они уже ушли.",
         "Ты ещё можешь их догнать...",
-        "Нет, ты не сможешь!",
+        "Нет, ты уже не сможешь!",
         "Ты опоздал...",
         "Когда настанет час - бойся Прилива!"
     ],
@@ -540,12 +580,12 @@ label act_1_hospital_before_start:
     mattias "Твои крики были слышны на весь собор."
 
     "Ты рассказываешь брату Маттиасу об увиденном тобой кошмаре."
-    "При воспоминании об отце Стефане с его белыми зрачками и жуткой ухмылкой по твоему телу бежит холодная дрожь."
+    "При воспоминаниях об отце Стефане с его белыми зрачками и жуткой ухмылкой по твоему телу бежит холодная дрожь."
     if(hero.prof == PROF.MONK):
         "В твоей памяти всплывают жуткие сны, которые ты уже видел когда-то в стенах Собора."
     elif(hero.prof == PROF.DOCTOR):
         "Никогда в своей жизни ты не видел таких жутких снов."
-    "Монах ободряюще берет тебя за руку."
+    "Монах ободряюще сжимает твое плечо."
 
     mattias "В последнее время люди видят кошмары все чаще..."
     "Отец Маттас протягивает тебе пузырек с искрящейся желтой жидкостью."
@@ -556,7 +596,7 @@ label act_1_hospital_before_start:
     elif(hero.prof == PROF.DOCTOR):
         mattias "Используй его с умом. Орден обычно не раздает эти эликсиры никому, кроме самих братьев."
     mattias "Такими темпами придется раздавать их всем жителям города..."
-    "В воздухе повисает долгое молчание, сопровождаемое лишь неровным дыханием твоего собеседника."
+    "В воздухе повисает долгое молчание, сопровождаемое лишь дыханием твоего собеседника."
     "Ты чувствуешь, что сознание снова начинает покидать тебя."
     "Маттиас, заметив это, беззвучно отступает от кровати и выходит за дверь."
     "Последнее, что ты слышишь перед погружением в сон, это звук удаляющихся шагов..."
@@ -564,7 +604,7 @@ label act_1_hospital_before_start:
     hide mattias default
     with dissolve
 
-    with long_fade
+    $ hard_fade("bed_view", 3.0)
     
     "Проснувшись снова, ты чувствуешь, что силы вернулись к тебе."
     "Голова всё ещё слегка кружится, но кошмар отступил, оставив после себя лишь смутное беспокойство."
@@ -572,14 +612,13 @@ label act_1_hospital_before_start:
     "Поднявшись на ноги спустя время, ты замечаешь, что за окном уже давно рассвело. Пора действовать."
 
     scene temple_inside 
-    with fade
+    with long_fade
 
     "Собор сильно изменился за время, пока ты спал."
     "Повсюду снуют братья Ордена с книгами и ветхими свитками в руках."
     "Помещение наводнили храмовые стражи, которых ты никогда не видел до этого в таком количестве."
     "Становится очевидным: уклад жизни города изменился навсегда."
-    "Слишком многое произошло без твоего участия. Слишком многое осталось без ответов."
-    "И настало время узнать правду."
+    "Осталось лишь понять, что делать дальше."
 
     $ renpy.take_screenshot()
     $ renpy.save("1-2", "Начало 1 акта")
@@ -590,19 +629,22 @@ label act_1_start:
     scene temple_inside
     with long_fade
 
+    show screen gui
+    with fade
+
     $ inventory_items = [
         InvItem("coins", "Золото", "images/misc/coins.png", "Золотая марка Морвейна. Причина людского раздора во все времена.", 300),
         InvItem("potion_hp", "Зелье исцеления", "images/misc/potion.png", "Колба с мерцающей красной жидкостью внутри. Исцеляет даже самые тяжелые раны.", 1),
         InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_energy.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 1),
     ]
 
-    menu optional_name:
-        "Начать собственное наследование":
+    menu:
+        "Искать улики в городе":
             jump act_1_own_investigation_start
-        "Обратиться к совету Ордена за помощью" if hero.ord_rel >= 2:
-            jump act_2_order_investigation_start
+        "Отправиться к Совету":
+            jump act_1_order_council
 
-label act_1_own_investigation_start:
+label act_1_neutral_streets:
     scene morvein_streets
     with fade
 
@@ -610,19 +652,131 @@ label act_1_own_investigation_start:
 
     return
 
-label act_2_order_investigation_start:
-    scene temple_inside
+label act_1_order_council:
+    scene temple_council
     with fade
 
-    "Помощь Ордена..."
+    "Ты подходишь к резным дверям, которые охраняет угрожающего вида храмовый страж."
+    "Он одаривает тебя недовольным взглядом, словно его отвлекли от чего-то важного, после чего нехотя молча приоткрывает двери."
+    "Ты входишь в зал и спустя пару секунд слышишь за собой грохот закрывающихся тяжелых створок."
+
+    scene temple_council
+    with fade
+
+    "Впереди от тебя, за массивным каменным столом, сидят трое старших братьев Ордена."
+    "В полумраке их лица кажутся высеченными из серого камня."
+    "Несколько мгновений никто не произносит ни слова."
+    "Затем сидящий по центру монах встает и скрипучим голосом обращается к тебе."
+
+    $ dream_char("edmund default", [center])
+
+    edmund "Доброе утро, [hero.full_name], мы вас ждали."
+    edmund "Вы были последним, кто видел отца Стефана в сознании."
+    edmund "И у нас есть к вам пара вопросов."
+    edmund "TBD"
+
+    narrator "TBD"
+
+    if (hero.prof == PROF.MONK) or (hero.ord_rel > 2):
+        if (hero.prof == PROF.MONK):
+                edmund "Совет доверяет вам, [hero.full_name]. Можете обратиться к брату Корнелиусу, как обычно."
+        else:
+            edmund "Что же, совет доверяет вам, поэтому вы получите доступ к архиву."
+            edmund "Покажите эту печать брату Корнелиусу, он вас впустит."
+
+        jump act_1_order_archives
+    else:
+        edmund "У Совета нет причины доверять незнакомцам, хотя отец Стефан и пригласил вас помочь ему"
+        edmund "Но всякое доверие можно заслужить."
+        edmund "Мы слышали, в городе появился торговец фальшивым черным вереском."
+        edmund "Как вам может быть известно, Орден делает из него эликсиры бодрости."
+        edmund "Сами понимаете, какое помешательство в городе начнется, если зелья из этой дряни попадут на прилавки.в"
+        edmund "Сумеете разобраться с проблемой — получите доступ в наши архивы."
+        edmund "Если не справитесь — тогда вам точно нечего делать в архивах."
+        
+        jump act_1_agatha_quest
+
+
+label act_1_order_archives:
+    scene temple_archives
+    with fade
+
+    $ dream_char("cornelius default", [center])
+
+    cornelius "Дарова!"
 
     return
 
-label dream_scene(texts_start, texts_horror = [], texts_end = [], show_gui_after = True):
-    hide screen gui
+label act_1_agatha_quest:
+    scene morvein_streets_mix
     with fade
 
-    hide screen char_stats
+    narrator "Вы выходите из собора и возвращаетесь в город."
+    narrator "Тут незнакомая бабища."
+
+    $ dream_char("agatha_default", [center])
+
+    agatha "Привет, красавчик!"
+
+    menu:
+        "Обратиться мирно":
+            "Ты просишь ее мирно ее прекратить."
+        "Грубо прервать ее":
+            "Ты бьешь ее палицей по голове."
+    
+    narrator "Агата кидает тебе в лицо кипу вереска и убегает прочь."
+    
+    hide agatha_default
+    with dissolve
+
+    # call dream_scene(
+    # [
+    #     [
+    #         "На короткое мгновение у тебя темнеет в глазах"
+    #     ],
+    #     [],
+    #     [],
+    #     False
+    # ])
+
+    show screen gui
+
+    narrator "Ты гонишься за ней."
+
+    if hero.dream >= 0:
+        narrator "Ты ввидишь скрытый путь"
+        narrator "Ты настигаешь ее."
+
+        menu:
+            "Cхватить ее и доставить в собор":
+                $ hero.ord_rel += 1
+                $ council_help_flag = True
+                $ agatha_release_flag = False
+            "Отпустить ее":
+                $ hero.ord_rel -= 1
+                $ hero.cult_rel += 1
+                $ agatha_release_flag = True
+                $ council_help_flag = False
+    else:
+        narrator "Ты упускаешь ее."
+        $ hero.ord_rel -= 1
+        $ council_help_flag = False
+
+    scene temple_council
+    with fade
+
+    show edmund default at center
+    with dissolve
+
+    if council_help_flag:
+        edmund "Мы разочарованы"
+        return
+    else:
+        "Мы довольны, го в архив"
+        jump act_1_order_archives
+
+label dream_scene(texts_start, texts_horror = [], texts_end = [], show_gui_after = True):
+    hide screen gui
     with fade
     
     $ start_dream_effect()

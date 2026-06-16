@@ -1,12 +1,18 @@
 # Картинки персонажей
-image stefan default = Transform("images/chars/stefan_default.png", zoom=0.6)
-image stefan horror = Transform("images/chars/stefan_horror.png", zoom=0.6)
-image beggar default = Transform("images/chars/beggar_default.png", zoom=0.6)
+image stefan default = Transform("images/chars/stefan_default.png", zoom=0.7)
+image stefan horror = Transform("images/chars/stefan_horror.png", zoom=0.7)
+image beggar default = Transform("images/chars/beggar_default.png", zoom=0.7)
 image cultist default = Transform("images/chars/cultist_default.png", xzoom=0.65, yzoom=0.7)
-image sleepwalkers default = Transform("images/chars/sleepwalkers.png", xzoom=0.65, yzoom=0.7)
-image mattias default = Transform("images/chars/mattias_default.png", xzoom=0.65, yzoom=0.7)
+image sleepwalkers default = Transform("images/chars/sleepwalkers.png", zoom=0.7)
+image mattias default = Transform("images/chars/mattias_default.png", zoom=0.7)
+image edmund default = Transform("images/chars/edmund_default.png", zoom=0.7)
+image cornelius default = Transform("images/chars/cornelius_default.png", zoom=0.7)
 
 # Персонажи
+define narrator = Character()
+define thoughts = Character(
+    what_italic=True
+)
 define dream = Character(
     None,
     what_font="fonts/dream.ttf",
@@ -28,3 +34,7 @@ define beggar = Character('Нищий', color="#7c9703")
 define stefan = Character('Отец Стефан', color="#b02d2d")
 define cultist = Character('Культист', color="#6a4001")
 define mattias = Character('Брат Маттиас', color="#19e6db")
+define edmund = Character('Брат Эдмунд', color="#0cb314")
+define cornelius = Character('Брат Корнелиус', color="#981aca")
+define agatha = Character('Агата', color="#eb049a")
+
