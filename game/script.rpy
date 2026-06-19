@@ -1,22 +1,5 @@
 ﻿# Вы можете расположить сценарий своей игры в этом файле.
 
-# Глобальные настройки
-define debug = True
-define config.menu_include_disabled = debug
-define config.rollback_enabled = debug
-define config.default_afm_enable = debug
-define quick_menu = debug
-default preferences.afm_enable = debug
-default preferences.afm_after_click = debug
-
-define config.has_autosave = False
-define config.autosave_on_choice = False
-define config.autosave_on_quit = False
-define config.autosave_frequency = None
-define config.keymap['quick_save'] = []
-define config.keymap['quick_load'] = []
-define config.default_textshader = "typewriter"
-
 # Флаги истории
 define hero_selected = False
 
@@ -24,6 +7,7 @@ define hero_selected = False
 define beggar_flag_help = False
 define agatha_release_flag = False
 define council_help_flag = False
+define trillian_seal_found_flag = False
 
 # Сценарий
 label start:
@@ -68,14 +52,14 @@ label start:
             full_name = "брат Мильтон", 
             prof = PROF.MONK, 
             state = STATE.HEALTHY, 
-            humanity = 2, 
-            will = 4, 
-            aspect = 7, 
-            control = 7, 
-            dream = 3, 
+            mercy = 2, 
+            reason = 4, 
+            aspect = 4, 
+            control = 9, 
             ord_rel = 3, 
             cult_rel = 0, 
-            image="images/chars/hero_milton_idle.png", 
+            image = "images/chars/hero_milton_idle.png",
+            portrait = "images/chars/hero/hero_milton_portrait.png",
             color="#f00")
         
         "Когда-то ты уже жил в Морвейне.
@@ -90,14 +74,14 @@ label start:
             full_name = "доктор Фальк", 
             prof = PROF.DOCTOR, 
             state = STATE.HEALTHY, 
-            humanity = 7, 
-            will = 7, 
-            aspect = 2, 
+            mercy = 7, 
+            reason = 8, 
+            aspect = 1, 
             control = 4, 
-            dream = 0, 
             ord_rel = 0, 
             cult_rel = 0, 
             image = "images/chars/hero_falk_idle.png", 
+            portrait = "images/chars/hero/hero_falk_portrait.png",
             color="#593ed0")
 
         "Первого пациента привели к тебе четыре дня назад.
@@ -227,7 +211,7 @@ label temple_outside:
         menu:
             "Бросить монетку":
                 "Поравнявшись с ним, ты кидаешь несчастному монетку в его почти пустую чашу. Взгляд нищего на секунду становится осмысленным, и он благодарно кивает."
-                $ add_stat(hero, "humanity", 1)
+                $ add_stat(hero, "mercy", 1)
                 $ beggar_flag_help = True
             "Пройти мимо":
                 "Ты проходишь мимо, решив, что перед тобой очередной безумец, сломленный Морвейном."
@@ -306,12 +290,12 @@ label temple_interrogation_room:
     "Его голова с грязными волосами опущена, а губы едва заметно шевелятся, словно произнося немую молитву."
  
     menu:
-        "Почему вы держите его в таком состоянии? Он сдался вам добровольно." if hero.humanity > 1:
+        "Почему вы держите его в таком состоянии? Он сдался вам добровольно." if hero.mercy > 1:
             hide cultist
             show stefan default at center
             with dissolve
             stefan "Ты, видимо, не знаешь, на что они способны."
-            $ add_stat(hero, "humanity", 1)
+            $ add_stat(hero, "mercy", 1)
         "Что вы от него уже узнали?":
             hide cultist
             show stefan default at center
@@ -326,10 +310,10 @@ label temple_interrogation_room:
     cultist "Ты уже видел их?"
 
     menu:
-        "..." if hero.dream > 0:
+        "..." if hero.aspect >= 2:
             cultist "Вижу, ты понимаешь, о чем я говорю."
             "Культист продолжает криво улыбаться."
-        "О чем ты?" if hero.dream == 0:
+        "О чем ты?" if hero.aspect < 2:
             cultist "Значит, время еще не пришло. Скоро."
             "Культист продолжает криво улыбаться."
 
@@ -640,7 +624,7 @@ label act_1_start:
 
     menu:
         "Искать улики в городе":
-            jump act_1_own_investigation_start
+            jump act_1_agatha_quest
         "Отправиться к Совету":
             jump act_1_order_council
 
@@ -701,11 +685,110 @@ label act_1_order_archives:
     scene temple_archives
     with fade
 
+    narrator "Зайдя в пыльное пространоство ахривов, ты видишь перед собой ветхого подслеповатого старика."
+    narrator "Кажется, что древние книги, уходящие бесконечным рядами вдаль, приходятся ему ровесниками."
+    narrator "С удивительной для такого пожилого человека грацией, монах пружинящей походкой подскакивает к вам."
+
     $ dream_char("cornelius default", [center])
 
-    cornelius "Дарова!"
+    cornelius "Добрый день, юноша!"
+    cornelius "Я слышал, Совет допустил вас до до моей обители. Слышал и то, что вы хотите найти в этих древних записях упоминания о предыдущем кризисе в Морвейне."
+    cornelius "Помяните мое слово: все решения невзгод дня текущего можно найти в ответах прошлого."
+    cornelius "Но простите старику его занудные речи."
+    cornelius "Думаю, я смогу вам помочь в вашем расследовании."
+    narrator "Архивариус кладёт перед тобой несколько тяжёлых томов, перевязанных потемневшей кожаной лентой."
+    cornelius "Не буду вам мешать."
 
-    return
+    $ hide_dream_char("cornelius default")
+
+    menu:
+        "Изучить первый том":
+            narrator "На обложке первого тома выведено: «О смуте сна в Морвейне»."
+            narrator "Дата под названием почти стёрлась, но ты понимаешь, что этим записям больше нескольких сотен лет."
+            narrator "Первые страницы книги рассказываеют об эпохе, когда Морвейном ещё управляли древние роды."
+            narrator "Ты понимаешь, как велика была роль этих родов в политической и религиозной жизни города."
+            narrator "Дальше по тексту идут довольно красочные описания жервоприношений, в том числе и человеческих."
+            narrator "Автор не скупится на описания, явно находя древние ритуалы варварскими и жестокими."
+            narrator "Следом ты находишь раздел с описанием первого кризиса сна в Морвейне, который горожане между собой называли «Приливом»"
+            narrator "Сначала речь идёт о странных кошмарах, которые со временем становятся все реалистичнее и ужаснее."
+            narrator "Затем появляются сообщения о людях, которые начинают ходить во сне, покидают свои дома и бесследно исчезают до рассвета."
+            narrator "С каждой станичей тон отчетов становятся всё более тревожными. Исчезновения учащаются, а среди жителей начинает распространяться паника."
+            narrator "Ближе к концу хроники ты находишь первые записи об истоках Ордена Ночи."
+            narrator "Неспособность знати Морвейна справиться с кризисом привела к возникновению религиозного культа, призывавшего остановить жертвоприношения."
+            narrator "Часть древних родов поддержала этот культ, утратив веру в способность справиться с распространяющимся ужасом."
+            narrator "Другая же половина выступила резко против. Но влияние этих родов ослабло со временем, когда прошлый Прилив по итог был остановлен силами Ордена."
+            narrator "Последняя страница книги завершается словами: «После принятия чрезвычайных мер распространение сна было остановлено»."
+            narrator "Ты несколько раз перечитываешь эти строки. После десятков страниц с описанием древней истории города, человеческих жертв и первом Приливе такие строки кажутся удивительно лаконичным."
+
+    $ inventory_items.append(
+        InvItem("order_history_1", 
+        "О смуте сна в Морвейне. Том I", 
+        "images/misc/manuscript.png",  
+        "Первый том хроники Морвейна, посвященный первоначальной истории города и истокам прошлого кризиса сна.",
+        1) 
+    )
+
+    with fade
+
+    menu:
+        "Перейти к следующему тому":
+            narrator "Следующий том хроники посвящен первым годам существования Ордена. Ты быстро находишь раздел, в котором рассказывается о преодолении кризиса."
+            narrator "Однако уже на первых строчках становится заметно, что с документами что-то не так. Некоторые строки аккуратно замазаны чернилами, а на месте отдельных местах остались лишь пустые промежутки."
+            narrator "В одном из отчётов сохранилось описание подготовки чрезвычайных мер. Следующая страница должна объяснять, что произошло дальше, но вместо текста ты находишь лишь следы вырезанных листов."  
+            narrator "Ты открываешь другой раздел, затем третий. Картина повторяется снова и снова. Всё, что касается создания Ордена, сохранилось почти полностью. Но все подробности о "
+            narrator "Судя по состоянию бумаги, это было сделано много лет назад. Кто-то потратил немало времени, чтобы убрать эти сведения из разных архивных записей."
+            narrator "На полях одного из отчётов сохранилась едва заметная пометка: «Доступ ограничён решением Совета». Это первое объяснение, которое тебе удаётся найти."
+    
+    $ inventory_items.append(
+        InvItem("order_history_2", 
+        "О смуте сна в Морвейне. Том II", 
+        "images/misc/manuscript.png",  
+        "Второй том хроники Морвейна, посвященный преодолению прошлого кризиса сна. Многие записи отсутствуют или изменены.",
+        1)
+    )
+
+    with fade
+
+    narrator "В какой-то момент ты ощущаешь на себе чей-то долгий и внимательный взгляд."
+    narrator "Подняв глаза, ты видишь, будто на тебя из темноты дальних стеллажей пристально смотрит укутанный в черный плащ незнакомец."
+    narrator "Заметив твой ответный взгляд, он поспешно скрывается из виду."
+    narrator "Когда ты берешь в руки следующий том, в конце прохода снова кто-то появляется. На этот раз сомнений нет — кроме тебя и архивариуса в зале находится ещё один человек."
+
+    menu:
+        "Преследовать незнакомца":
+            "Добежав до места, где незнакомец стоял минуту назад, ты не находишь никого."
+            "Прежнее присутствие постороннего в зале выдают лишь следы сапог на пыльном полу."
+
+    if hero.reason >=7:
+        narrator "При взшляде на пол ты замечаещь крошечную гербовую печать."
+        narrator "Ты берешь ее в руки и внимательно осматриваешь."
+        narrator "Через пару секунд ты понимаешь, где видел знак на печати — это символ дома Триллианов, одного из старейших и влиятельнейших родов Морвейна."
+        narrator "Ты чувствуешь, что нащупал зацепку. Если кто и может поведать о прошлом, то это наследник старого дома."
+        $ trillian_seal_found_flag = True
+
+        menu:
+            "Отправиться к усадьбе Триллианов":
+                jump act_1_rykard_first_meeting
+    else:
+        narrator "Осмотрев место, ты не находишь ничего примечательного и возврашаешься назад."
+        narrator "Ты продолжаешь изучение очередного тома, ощущая наступающую с каждой минутой усталость."
+
+        if hero.aspect >= 2:
+            call dream_scene(
+                [
+                    "На короткое мгновение ты чувствуешь, как мир вокруг тебя потемнел.",
+                    "Перед твоими глазами всплывает незнакомая фигура с .",
+                    "Тебе кажется, будто ты видел этот знак совсем недавно.",
+                ],
+                "rykard",
+                [],
+                [],
+                True)
+        else:
+            narrator "Ты понимаешь, что сегодня уже не найдешь ничего путного."
+            narrator "Разочарованно ты выходишь из архива и направляешься в сторону города."
+            $ trillian_seal_found_flag = False
+            jump act_1_agatha_quest
 
 label act_1_agatha_quest:
     scene morvein_streets_mix
@@ -714,36 +797,42 @@ label act_1_agatha_quest:
     narrator "Вы выходите из собора и возвращаетесь в город."
     narrator "Тут незнакомая бабища."
 
-    $ dream_char("agatha_default", [center])
+    $ dream_char("agatha default", [center])
 
     agatha "Привет, красавчик!"
 
     menu:
         "Обратиться мирно":
-            "Ты просишь ее мирно ее прекратить."
-        "Грубо прервать ее":
-            "Ты бьешь ее палицей по голове."
+            "Ты просишь ее мирно ее прекратить, незаметно приближаясь к ней."
+            menu:
+                "Схватить ее":
+                    if hero.control > 3:
+                        "Ты хватаешь ее"
+                    else:
+                        "Ты упусаешь ее"
+                "Отпустить ее":
+                    "Ты отпускаешь ее"
+        "Cхватить ее":
+            if hero.control > 10:
+                "Ты хватаешь ее"
+            else:
+                "Ты упусаешь ее"
     
     narrator "Агата кидает тебе в лицо кипу вереска и убегает прочь."
     
     hide agatha_default
     with dissolve
 
-    # call dream_scene(
-    # [
-    #     [
-    #         "На короткое мгновение у тебя темнеет в глазах"
-    #     ],
-    #     [],
-    #     [],
-    #     False
-    # ])
-
-    show screen gui
+    call dream_scene(
+        ["На короткое мгновение у тебя темнеет в глазах"],
+        None,
+        [],
+        [],
+        True)
 
     narrator "Ты гонишься за ней."
 
-    if hero.dream >= 0:
+    if hero.aspect >= 0:
         narrator "Ты ввидишь скрытый путь"
         narrator "Ты настигаешь ее."
 
@@ -769,49 +858,119 @@ label act_1_agatha_quest:
     with dissolve
 
     if council_help_flag:
-        edmund "Мы разочарованы"
-        return
-    else:
-        "Мы довольны, го в архив"
+        edmund "Мы довольны, го в архив"
         jump act_1_order_archives
+    else:
+        edmund "Мы разочарованы"
+        jump act_1_neutral_streets
 
-label dream_scene(texts_start, texts_horror = [], texts_end = [], show_gui_after = True):
-    hide screen gui
+label act_1_rykard_first_meeting:
+    scene black
+    with fade
+
+    $ dream_char("rykard default", [center])
+
+    narrator "Ты видишь Рикарда."
+    rykard "Здарова, чел!"
+    rykard "Ща тебе все покажу."
+
+    jump act_1_rykard_house
+
+label act_1_rykard_house:
+    scene black
+    with fade
+
+    $ dream_char("rykard default", [center])
+
+    narrator "Ты идешь за Рикардом."
+    rykard "Вот смотри."
+
+    if hero.cult_rel >= 5:
+        rykard "Ты там очень помог, го с нами?"
+        jump act_1_path_choice
+    else:
+        rykard "Мы тебе недостаточно доверяем, помоги нам!"
+        jump act_1_rykard_quest
+
+label act_1_rykard_quest:
+    scene green
+    with fade
+
+    $ dream_char("rykard default", [center])
+
+    rykard "Ты справился, теперь мы тебе доверяем."
+
+    jump act_1_rykard_library
+
+label act_1_rykard_library:
+    scene green
+    with fade
+
+    $ dream_char("rykard default", [center])
+
+    rykard "Ты изучаешь архивы."
+
+    jump act_1_path_choice
+
+label act_1_path_choice:
+    scene green
     with fade
     
-    $ start_dream_effect()
+    menu:
+        "Отправиться на встречу с культистами":
+            jump act_1_cultist_meeting
+        "Сдать заговорщиков Ордену":
+            jump act_1_cultist_arrest
+        "Идти в храм одному":
+            jump act_1_neutral_acnient_temple
 
-    $ old_skip = preferences.skip_unseen
-    $ preferences.skip_unseen = False
+label act_1_cultist_meeting:
+    scene blue
+    with fade
 
-    with long_fade
+    $ dream_char("rykard default", [center])
 
-    python:
-        for text in texts_start:
-            dream(text)
-            renpy.pause(2.0, hard=True)
+    narrator "Ты в совете!"
 
-    if texts_horror:
-        show stefan horror with dissolve
-        python:
-            for text in texts_horror:
-                horror(text)
-                renpy.pause(2.0, hard=True)
-        hide stefan horror with long_fade
+    jump act_1_cultist_acnient_temple
 
-    if texts_end:
-        python:
-            for text in texts_end:
-                dream(text)
-                renpy.pause(2.0, hard=True)
+label act_1_cultist_arrest:
+    scene red
+    with fade
 
-    with long_fade
+    $ dream_char("rykard default", [center])
 
-    if show_gui_after:
-        show screen gui (hero)
-        with fade
+    narrator "Культисты арестованы."
 
-    $ stop_dream_effect()
+    jump act_1_order_acnient_temple
 
-    $ preferences.skip_unseen = old_skip
+label act_1_neutral_acnient_temple:
+    scene green
+    with fade
+
+    $ dream_char("rykard default", [center])
+
+    narrator "Ты идешь в храм один."
+
+    return
+
+label act_1_cultist_acnient_temple:
+    scene blue
+    with fade
+
+    $ dream_char("rykard default", [center])
+
+    narrator "Ты идешь в храм с культистами."
+
+    return
+
+label act_1_order_acnient_temple:
+    scene red
+    with fade
+
+    $ dream_char("rykard default", [center])
+
+    narrator "Ты идешь в храм с Орденом."
+
+    return
     

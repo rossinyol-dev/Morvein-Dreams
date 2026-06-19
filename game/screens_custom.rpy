@@ -179,8 +179,6 @@ screen blood_overlay(hero_instance):
         timer 10.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
         # $ debuff_stats(hero_instance)
 
-########
-
 # Модалка персонажа
 screen char_stats():
     modal True
@@ -191,30 +189,55 @@ screen char_stats():
     fixed:
         align (0.5, 0.5)
         xysize (1920, 1080)
-        add "images/misc/char_inside.png"
-   
+
+        add "images/misc/char_list.png"
+
         hbox:
-            add [hero.image]:
-                zoom 0.5
+            align (0.5, 0.5)
+            spacing 200
+
+            add hero.portrait:
+                xoffset 75
+                xysize (600, 900)
+
             vbox:
-                align (0.75, 0.1)
-                spacing 50
-                style_prefix ("char_page_text")
+                yalign 0.5
+                spacing 30
+                xysize (900, 800)
+                style_prefix "char_page_style"
+
                 vbox:
                     spacing 40
+                    yoffset 50
+
                     text "{color=[hero.color]}[hero.name]{/color}"
                     text "[hero.prof.value]"
+                    text "Состояние персонажа: [hero.state.value]"
+
                 vbox:
                     spacing 20
-                    text "[stat_desc(hero.humanity, mercy_desc, mercy_colors)]"
-                    text "[stat_desc(hero.will, reason_desc, reason_colors)]"
+                    yoffset -50
+
+                    text "[stat_desc(hero.mercy, mercy_desc, mercy_colors)]"
+                    text "[stat_desc(hero.reason, reason_desc, reason_colors)]"
                     text "[stat_desc(hero.aspect, aspect_desc, aspect_colors)]"
                     text "[stat_desc(hero.control, control_desc, control_colors)]"
-            imagebutton:
-                align (0.99, 0.01)
-                idle Transform("images/misc/exit.png", zoom=0.18, alpha=0.7)
-                hover Transform("images/misc/exit.png", zoom=0.18, alpha=1.0)
-                action Hide("char_stats")
+
+        imagebutton:
+            align (0.942, 0.122)
+
+            idle Transform(
+                "images/misc/cross.png",
+                zoom=0.2,
+                alpha=0.8
+            )
+            hover Transform(
+                "images/misc/cross.png",
+                zoom=0.2,
+                alpha=1.0
+            )
+
+            action Hide("char_stats")
 
 # Модалка выбора персонажа
 screen char_choice():
@@ -333,7 +356,7 @@ screen inventory_overlay():
 
                         hovered Show("item_description", item=inv_item, item_x=item_x, item_y=item_y)
                         unhovered Hide("item_description")
-                        action NullAction()
+                        action Function(inventory_item_click, inv_item)
 
                         fixed:
                             xysize (200, 200)
@@ -353,7 +376,23 @@ screen inventory_overlay():
                                 size 24
                                 color "#000000"
                                 outlines [(1, "#475544", 0, 0)]
-                
+        imagebutton:
+            align (0.95, 0.05)
+
+            idle Transform(
+                "images/misc/cross.png",
+                zoom=0.3,
+                alpha=0.6
+            )
+            hover Transform(
+                "images/misc/cross.png",
+                zoom=0.3,
+                alpha=1.0
+            )
+
+            action Hide("inventory_overlay")
+            
+
     key "K_ESCAPE" action Hide("inventory_overlay")
 
 # Описание предметов
@@ -503,3 +542,47 @@ label hero_died:
     
     return
 
+# Сцена сна
+label dream_scene(texts_start = [], horror_char = None, texts_horror = [],  texts_end = [], show_gui_after = None):
+    hide screen gui
+    with fade
+
+    $ renpy.show("black", zorder=-100)
+
+    $ start_dream_effect()
+
+    $ old_skip = preferences.skip_unseen
+    $ preferences.skip_unseen = False
+
+    with long_fade
+
+    python:
+        for text in texts_start:
+            horror(text)
+            renpy.pause(2.0, hard=True)
+
+    if texts_horror:
+        if horror_char:
+            show expression horror_char
+            with dissolve
+        python:
+            for text in texts_horror:
+                horror(text)
+                renpy.pause(2.0, hard=True)
+        hide stefan horror with long_fade
+
+    if texts_end:
+        python:
+            for text in texts_end:
+                dream(text)
+                renpy.pause(2.0, hard=True)
+
+    with long_fade
+
+    if show_gui_after:
+        show screen gui(hero)
+        with fade
+
+    $ stop_dream_effect()
+
+    $ preferences.skip_unseen = old_skip

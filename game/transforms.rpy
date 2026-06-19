@@ -59,3 +59,10 @@ transform dream_shadow:
         linear 3 zoom 1.02 alpha 0.6
         linear 3 zoom 1.03 alpha 0.8
         repeat
+
+# Неоновое пульсирование
+transform neon_pulse:
+    alpha 0.4
+    linear 1.5 alpha 0.8
+    linear 1.5 alpha 0.4
+    repeat

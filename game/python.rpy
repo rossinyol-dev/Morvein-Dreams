@@ -1,8 +1,8 @@
 define aspect_colors = [
-    "#2c1332", # 0-2
-    "#4d1f5a", # 3-4
-    "#6f2b84", # 5-6
-    "#9440b0", # 7-8
+    "#eda5ff", # 0-2
+    "#da52ff", # 3-4
+    "#cc26ff", # 5-6
+    "#c310ff", # 7-8
     "#cc00ff", # 9-10
 ]
 
@@ -23,11 +23,76 @@ define reason_colors = [
 ]
 
 define control_colors = [
-    "#566B52",
-    "#6F8A68",
-    "#8FAE8B",
-    "#A8C9A3",
-    "#C2E0BC",
+    "#2f372d",
+    "#265619",
+    "#2a831e",
+    "#42a31fff",
+    "#44ff00ff",
+]
+
+define GREEK_MAP = {
+    "а": "α",
+    "е": "ε",
+    "з": "ζ",
+    "и": "ι",
+    "к": "κ",
+    "м": "μ",
+    "н": "η",
+    "о": "ο",
+    "р": "ρ",
+    "с": "ς",
+    "т": "τ",
+    "у": "υ",
+    "ф": "φ",
+    "х": "χ",
+
+    "А": "Α",
+    "Е": "Ε",
+    "З": "Ζ",
+    "И": "Ι",
+    "К": "Κ",
+    "М": "Μ",
+    "Н": "Η",
+    "О": "Ο",
+    "Р": "Ρ",
+    "С": "Σ",
+    "Т": "Τ",
+    "У": "Υ",
+    "Ф": "Φ",
+    "Х": "Χ",
+}
+
+
+define mercy_desc = [
+    "Чужая боль тебя не трогает.",
+    "Иногда ты готов помогать другим — если это тебе выгодно.",
+    "Ты остро переживаешь чужие страдания.",
+    "Ради других ты готов жертвовать собственным благополучием.",
+    "Чужая судьба для тебя почти так же важна, как собственная."
+]
+
+define reason_desc = [
+    "Ты всё чаще упускаешь важные детали.",
+    "Ты замечаешь больше, чем большинство людей.",
+    "Ты начинаешь видеть закономерности там, где другие видят случайности.",
+    "Немногие способны скрыть что-либо от твоего взгляда.",
+    "Ты видишь связи, недоступные большинству людей."
+]
+
+define aspect_desc = [
+    "Сны проходят мимо тебя, не оставляя следа.",
+    "Иногда тебе кажется, что мир говорит с тобой.",
+    "Сны оставляют след даже после пробуждения.",
+    "Граница между сном и явью становится тоньше.",
+    "Что-то по ту сторону начинает замечать тебя в ответ."
+]
+
+define control_desc = [
+    "Эмоции всё чаще берут верх над рассудком.",
+    "Ты ещё способен держать себя в руках.",
+    "Даже под давлением ты сохраняешь ясность мысли.",
+    "Твой разум остаётся непоколебим даже перед лицом ужаса.",
+    "Ты полностью владеешь собой и своими страхами."
 ]
 
 # Определение Python типов и функций
@@ -38,37 +103,7 @@ init python:
     import re
     import time
 
-    GREEK_MAP = {
-        "а": "α",
-        "е": "ε",
-        "з": "ζ",
-        "и": "ι",
-        "к": "κ",
-        "м": "μ",
-        "н": "η",
-        "о": "ο",
-        "р": "ρ",
-        "с": "ς",
-        "т": "τ",
-        "у": "υ",
-        "ф": "φ",
-        "х": "χ",
-
-        "А": "Α",
-        "Е": "Ε",
-        "З": "Ζ",
-        "И": "Ι",
-        "К": "Κ",
-        "М": "Μ",
-        "Н": "Η",
-        "О": "Ο",
-        "Р": "Ρ",
-        "С": "Σ",
-        "Т": "Τ",
-        "У": "Υ",
-        "Ф": "Φ",
-        "Х": "Χ",
-    }
+    config.layers = [ "background", "master", "transient", "screens", "overlay" ]
 
     class STATE(enum.Enum):
         HEALTHY = "Здоров"
@@ -81,19 +116,19 @@ init python:
         MONK = "Монах"
 
     class Hero:
-        def __init__(self, name, full_name, prof, state, humanity, will, aspect, control, dream, ord_rel, cult_rel, image, color):
+        def __init__(self, name, full_name, prof, state, mercy, reason, aspect, control, ord_rel, cult_rel, image, portrait, color):
             self.name = name
             self.full_name = full_name
             self.prof = prof
             self.state = state
-            self.humanity = humanity
-            self.will = will
+            self.mercy = mercy
+            self.reason = reason
             self.aspect = aspect
             self.control = control
-            self.dream = dream
             self.ord_rel = ord_rel
             self.cult_rel = cult_rel
             self.image = image
+            self.portrait = portrait
             self.color = color
 
     class Note(object):
@@ -145,20 +180,20 @@ init python:
 
     def debuff_stats(hero):
         isDebuffed: True
-        hero.humanity -= 1
-        hero.will -= 1
+        hero.mercy -= 1
+        hero.reason -= 1
         hero.aspect -= 1
         hero.control -= 1
     
     def heal_debuff(hero):
         if (isDebuffed):
-            hero.humanity += 1
-            hero.will += 1
+            hero.mercy += 1
+            hero.reason += 1
             hero.aspect += 1
             hero.control += 1
     
     def reduce_dream(hero):
-        hero.dream =- 1
+        hero.aspect =- 1
 
     # Эффекты
     def start_dream_effect():
@@ -168,6 +203,7 @@ init python:
             "audio/dream_theme.mp3",
             fadein=2.0
         )
+        renpy.show("black", layer="background")
         renpy.layer_at_list([slow_shaking], layer="master")
 
     def stop_dream_effect():
@@ -176,7 +212,7 @@ init python:
         resume_music()
 
     def check_dream(min_value, text):
-        if hero.dream > min_value:
+        if hero.aspect > min_value:
             # Начинаем отображение сна
             renpy.transition(fade)
             renpy.sound.play("audio/fx/dream_fx.mp3") 
@@ -220,7 +256,7 @@ init python:
         if hero_selected:
             parts = re.split(r'(\{.*?\})', text)
             result = []
-            chance = 0.2 + (hero.dream - 3) * 0.1
+            chance = 0.2 + (hero.aspect - 3) * 0.1
 
             for part in parts:
                 if part.startswith("{") and part.endswith("}"):
@@ -253,7 +289,7 @@ init python:
 
         low_dream_level=3
 
-        if hero.dream >= low_dream_level:
+        if hero.aspect >= low_dream_level:
             renpy.show(
                 image_name,
                 tag=image_name.split()[0] + "_shadow",
@@ -267,6 +303,19 @@ init python:
             zorder=z
         )
 
+        renpy.transition(transition)
+
+    def hide_dream_char(image_name, transition=dissolve):
+        # Получаем тег персонажа (первое слово в названии)
+        tag_name = image_name.split()[0]
+        
+        # Скрываем тень персонажа
+        renpy.hide(tag_name + "_shadow")
+        
+        # Скрываем самого персонажа
+        renpy.hide(tag_name)
+        
+        # Применяем эффект перехода
         renpy.transition(transition)
 
 
@@ -312,38 +361,35 @@ init python:
 
         return "{color=%s}%s{/color}" % (color_table[idx], text_table[idx])
 
+    # 1. Определяем функцию, которая будет собирать и выводить данные
+    def debug_print_properties():
+        # Проверяем, существует ли нужный объект в игре, чтобы избежать вылета
+        if 'hero' in globals():
+            obj = globals()['hero']
+            
+            # Печатаем в системную консоль/терминал (откуда запущен Ren'Py)
+            print("\n=== DEBUG PROPERTIES ===")
+            for k, v in vars(obj).items():
+                print(f"{k}: {v}")
+            print("========================\n")
+            
+            # Дублируем вывод в log.txt (на случай, если консоль закрыта)
+            renpy.log(f"DEBUG: {vars(obj)}")
+            
+            # Опционально: показываем быстрое уведомление на экране игры
+            renpy.notify("Свойства объекта hero напечатаны в консоль!")
+        else:
+            renpy.notify("Ошибка: Объект 'hero' еще не создан.")
 
-    mercy_desc = [
-        "Чужая боль тебя почти не трогает.",
-        "Ты стараешься помогать людям, когда можешь.",
-        "Ты остро переживаешь чужие страдания.",
-        "Ради других ты готов жертвовать собственным благополучием.",
-        "Чужая судьба для тебя почти так же важна, как собственная."
-    ]
+    # 2. Регистрируем новое действие в системе клавиш Ren'Py
+    # Назначаем комбинацию ctrl_K_d (Ctrl + D)
+    config.underlay.append(renpy.Keymap(ctrl_K_d = debug_print_properties))
 
-    reason_desc = [
-        "Ты всё чаще упускаешь важные детали.",
-        "Ты замечаешь больше, чем большинство людей.",
-        "Ты начинаешь видеть закономерности там, где другие видят случайности.",
-        "Немногие способны скрыть что-либо от твоего взгляда.",
-        "Ты видишь связи, недоступные большинству людей."
-    ]
-
-    aspect_desc = [
-        "Сны проходят мимо тебя, не оставляя следа.",
-        "Иногда тебе кажется, что мир говорит с тобой.",
-        "Сны оставляют след даже после пробуждения.",
-        "Граница между сном и явью становится тоньше.",
-        "Что-то по ту сторону сна начинает замечать тебя в ответ."
-    ]
-
-    control_desc = [
-        "Эмоции всё чаще берут верх над рассудком.",
-        "Ты ещё способен держать себя в руках.",
-        "Даже под давлением ты сохраняешь ясность мысли.",
-        "Твой разум остаётся непоколебим даже перед лицом ужаса.",
-        "Ты полностью владеешь собой и своими страхами."
-    ]
+    def inventory_item_click(item):
+        if item.id == "order_history_2":
+            renpy.hide_screen("inventory_overlay")
+            renpy.hide_screen("item_description")
+            item.count -= 1
 
     # def start_glitch_loop(normal_track, reverse_track):
     #     renpy.music.play(normal_track, channel='music')

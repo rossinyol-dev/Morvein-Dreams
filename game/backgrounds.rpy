@@ -16,3 +16,9 @@ image morvein_from_temple = im.Scale("bg/morvein_from_temple.png", 1920, 1200)
 image bed_view = im.Scale("bg/bed_view.png", 1920, 1080)
 image temple_council = im.Scale("bg/temple_council.png", 1920, 1080)
 image temple_archives = im.Scale("bg/temple_archives.png", 1920, 1080)
+
+# Однотонные фоны
+image white = Solid("#ffffff")
+image red = Solid("#8b0000")
+image blue = Solid("#1b2a5b")
+image green = Solid("#04ff00")
