@@ -922,7 +922,7 @@ label act_1_path_choice:
         "Сдать заговорщиков Ордену":
             jump act_1_cultist_arrest
         "Идти в храм одному":
-            jump act_1_neutral_acnient_temple
+            jump act_1_neutral_ancient_temple
 
 label act_1_cultist_meeting:
     scene blue
@@ -932,7 +932,7 @@ label act_1_cultist_meeting:
 
     narrator "Ты в совете!"
 
-    jump act_1_cultist_acnient_temple
+    jump act_1_cultist_ancient_temple
 
 label act_1_cultist_arrest:
     scene red
@@ -942,9 +942,9 @@ label act_1_cultist_arrest:
 
     narrator "Культисты арестованы."
 
-    jump act_1_order_acnient_temple
+    jump act_1_order_ancient_temple
 
-label act_1_neutral_acnient_temple:
+label act_1_neutral_ancient_temple:
     scene green
     with fade
 
@@ -954,7 +954,7 @@ label act_1_neutral_acnient_temple:
 
     return
 
-label act_1_cultist_acnient_temple:
+label act_1_cultist_ancient_temple:
     scene blue
     with fade
 
@@ -964,7 +964,7 @@ label act_1_cultist_acnient_temple:
 
     return
 
-label act_1_order_acnient_temple:
+label act_1_order_ancient_temple:
     scene red
     with fade
 
