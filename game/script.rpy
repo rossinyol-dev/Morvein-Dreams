@@ -54,7 +54,7 @@ label start:
             state = STATE.HEALTHY, 
             mercy = 2, 
             reason = 4, 
-            aspect = 4, 
+            aspect = 3, 
             control = 9, 
             ord_rel = 3, 
             cult_rel = 0, 
@@ -74,8 +74,8 @@ label start:
             full_name = "доктор Фальк", 
             prof = PROF.DOCTOR, 
             state = STATE.HEALTHY, 
-            mercy = 7, 
-            reason = 8, 
+            mercy = 6, 
+            reason = 7, 
             aspect = 1, 
             control = 4, 
             ord_rel = 0, 
@@ -554,6 +554,9 @@ label act_1_hospital_before_start:
         "Когда настанет час — бойся Прилива!"
     ],
     False)
+
+    if hero.aspect <= 2:
+        $ add_stat(hero, "aspect", 1)
     
     show mattias default at center 
     with dissolve
@@ -832,7 +835,7 @@ label act_1_agatha_quest:
 
     narrator "Ты гонишься за ней."
 
-    if hero.aspect >= 0:
+    if hero.aspect >= 3:
         narrator "Ты видишь скрытый путь."
         narrator "Ты настигаешь ее."
 
@@ -910,7 +913,7 @@ label act_1_rykard_library:
 
     rykard "Ты изучаешь архивы."
 
-    jump act_1_path_choice
+    jump act_1_path_choice 
 
 label act_1_path_choice:
     scene green

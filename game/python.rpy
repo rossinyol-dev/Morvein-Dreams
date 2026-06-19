@@ -62,7 +62,6 @@ define GREEK_MAP = {
     "Х": "Χ",
 }
 
-
 define mercy_desc = [
     "Чужая боль тебя не трогает.",
     "Иногда ты готов помогать другим — если это тебе выгодно.",
@@ -385,55 +384,4 @@ init python:
     # Назначаем комбинацию ctrl_K_d (Ctrl + D)
     config.underlay.append(renpy.Keymap(ctrl_K_d = debug_print_properties))
 
-    def inventory_item_click(item):
-        if item.id == "order_history_2":
-            renpy.hide_screen("inventory_overlay")
-            renpy.hide_screen("item_description")
-            item.count -= 1
-
-    # def start_glitch_loop(normal_track, reverse_track):
-    #     renpy.music.play(normal_track, channel='music')
-        
-    #     state = {
-    #         'last_switch': time.time(),
-    #         'current_track': normal_track,
-    #         'is_reversed': False,
-    #         'next_interval': random.uniform(4.0, 7.0)
-    #     }
-        
-    #     if 'glitch_loop' in globals():
-    #         try: config.periodic_callbacks.remove(glitch_loop)
-    #         except: pass
-            
-    #     def glitch_loop():
-    #         if not renpy.music.get_playing(channel='music'):
-    #             config.periodic_callbacks.remove(glitch_loop)
-    #             return
-
-    #         if time.time() - state['last_switch'] >= state['next_interval']:
-    #             current_pos = renpy.music.get_pos(channel='music') or 0.0
-                
-    #             state['is_reversed'] = not state['is_reversed']
-    #             state['current_track'] = reverse_track if state['is_reversed'] else normal_track
-                
-    #             glitch_file = "<from {}>{}".format(current_pos, state['current_track'])
-                
-    #             # fadeout=0.5 — плавно тушит текущий трек за 0.5 сек
-    #             # fadein=0.5 — плавно включает новый трек за 0.5 сек
-    #             renpy.music.play(glitch_file, channel='music', fadeout=3.0, fadein=3.0, tight=True)
-                
-    #             state['last_switch'] = time.time()
-    #             state['next_interval'] = random.uniform(8.0, 10.0)
-                
-    #     globals()['glitch_loop'] = glitch_loop
-    #     config.periodic_callbacks.append(glitch_loop)
-
-    # def stop_glitch_loop():
-    #     if 'glitch_loop' in globals():
-    #         try:
-    #             config.periodic_callbacks.remove(glitch_loop)
-    #             del globals()['glitch_loop']
-    #         except:
-    #             pass
-    #     renpy.music.stop(channel='music')
 
