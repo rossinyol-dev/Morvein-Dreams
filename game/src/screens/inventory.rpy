@@ -69,16 +69,16 @@ screen inventory_overlay():
                                     color "#000000"
                                     outlines [(1, "#475544", 0, 0)]
         imagebutton:
-            align (0.91, 0.102)
+            align (0.903, 0.108)
 
             idle Transform(
                 "images/misc/cross.png",
-                zoom=0.24,
+                zoom=0.2,
                 alpha=0.8
             )
             hover Transform(
                 "images/misc/cross.png",
-                zoom=0.24,
+                zoom=0.2,
                 alpha=1.0
             )
 

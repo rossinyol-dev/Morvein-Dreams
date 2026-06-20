@@ -198,7 +198,7 @@ screen char_stats():
 
             add hero.portrait:
                 xoffset 75
-                xysize (600, 900)
+                xysize (500, 750)
 
             vbox:
                 yalign 0.5
@@ -224,7 +224,7 @@ screen char_stats():
                     text "[stat_desc(hero.control, control_desc, control_colors)]"
 
         imagebutton:
-            align (0.942, 0.122)
+            align (0.94, 0.105)
 
             idle Transform(
                 "images/misc/cross.png",
