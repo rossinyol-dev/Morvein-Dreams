@@ -1,4 +1,12 @@
 init python:
+    class InvItem(object):
+        def __init__(self, item_id, title, icon, description, count):
+            self.id = item_id
+            self.title = title
+            self.icon = icon
+            self.description = description
+            self.count = count
+    
     def inventory_item_click(item):
         if item.id == "order_history_2":
             use_order_history()
