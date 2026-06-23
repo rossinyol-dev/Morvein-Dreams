@@ -23,8 +23,3 @@ style death_style:
     size 60
     color "#ffffff"
     outlines [ (2, "#000000", 0, 0) ]
-
-style char_page_style_text:
-    font "fonts/char.ttf"
-    size 40
-    outlines [(0, "#ffffffc5", 0, 0)]

@@ -1,18 +1,11 @@
 default saved_music_pos = 0.0
 default saved_music_file = None
 define hovered_note = None
-default hovered_inv_item = None
 default journal_notes = [
     Note("main", "Задачи", "Здесь ты можешь записывать свои мысли."),
     Note("side", "Заметки", "Здесь можно хранить любую информацию, которая может пригодиться в будущем.")
 ]
-default inventory_items = []
-default isDebuffed = False
 define long_fade = Fade(2.0, 0.5, 2.0)
-
-# ============
-# МЕНЮ
-# ============
 
 # Основное меню
 screen main_menu():
@@ -42,107 +35,6 @@ screen main_menu():
 
     fixed:
         style_prefix "main_menu"
-
-# ============
-# GUI
-# ============
-
-# Кнопка журнала
-screen journal_button():
-    modal False
-
-    fixed:
-        xysize (100, 100)
-
-        add Transform(
-            "images/misc/journal.png",
-            zoom=0.20,
-            alpha=1.0,
-            matrixcolor=TintMatrix("#ff4800")
-        ):
-            align (0.5, 0.5)
-
-        imagebutton:
-            idle Transform("images/misc/journal.png", zoom=0.18, alpha=0.9)
-            hover Transform("images/misc/journal.png", zoom=0.20, alpha=1.0)
-
-            align (0.5, 0.5)
-            action Show("journal_overlay")
-
-# Кнопка персонажа
-screen char_button:
-    modal False
-
-    fixed:
-        xysize (100, 100)
-
-        add Transform(
-            "images/misc/helmet.png",
-            zoom=0.20,
-            alpha=1.0,
-            matrixcolor=TintMatrix("#ff4800")
-        ):
-            align (0.5, 0.5)
-
-        imagebutton:
-            idle Transform("images/misc/helmet.png", zoom=0.18, alpha=0.9)
-            hover Transform("images/misc/helmet.png", zoom=0.20, alpha=1.0)
-
-            align (0.5, 0.5)
-            action Show("char_stats")
-
-# Кнопка инвентаря
-screen inventory_button():
-    modal False
-
-    fixed:
-        xysize (100, 100)
-
-        add Transform(
-            "images/misc/inventory.png",
-            zoom=0.20,
-            alpha=1.0,
-            matrixcolor=TintMatrix("#ff4800")
-        ):
-            align (0.5, 0.5)
-
-        imagebutton:
-            idle Transform("images/misc/inventory.png", zoom=0.18, alpha=0.9)
-            hover Transform("images/misc/inventory.png", zoom=0.20, alpha=1.0)
-
-            align (0.5, 0.5)
-            action Show("inventory_overlay")
-
-# HUD
-screen hud():
-    zorder 100 # Поверх остальных элементов (чтобы не перекрывался диалоговым окном)
-    
-    add Solid("#00000000") 
-
-    frame:
-        background None
-
-        xalign 0.9 # Отступ слева
-        yalign 0.05 # Отступ сверху
-        
-        hbox:
-            spacing 100
-            use char_button
-            use journal_button
-            use inventory_button
-        
-# GUI
-screen gui:
-    use blood_overlay(hero)
-    use hud
-
-# ============
-# Модалки
-# ============
-
-# ============
-# Оверлеи
-# ============
 
 # Оверлей сна
 screen dream_text_overlay(dream_text, display_time):
@@ -176,7 +68,7 @@ screen blood_overlay(hero_instance):
         add "images/misc/state_gravely.png" alpha 0.5
     elif hero_instance.state == STATE.GRAVELY:
         add "images/misc/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
-        timer 10.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
+        timer 20.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
         # $ debuff_stats(hero_instance)
 
 # Модалка выбора персонажа
@@ -402,13 +294,13 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [],  text
 
     if texts_horror:
         if horror_char:
-            show expression horror_char
+            show expression horror_char as horror_character
             with dissolve
+
         python:
             for text in texts_horror:
                 horror(text)
                 renpy.pause(2.0, hard=True)
-        hide stefan horror with long_fade
 
     if texts_end:
         python:
@@ -416,7 +308,10 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [],  text
                 dream(text)
                 renpy.pause(2.0, hard=True)
 
-    with long_fade
+    hide horror_character
+    with dissolve
+
+    $ long_fade(2.0)
 
     if show_gui_after:
         show screen gui(hero)
