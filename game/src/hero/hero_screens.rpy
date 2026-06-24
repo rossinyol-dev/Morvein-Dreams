@@ -64,3 +64,11 @@ screen char_stats():
             action Hide("char_stats")
 
     key "K_ESCAPE" action Hide("char_stats")
+
+# Оверлей ранения    
+screen blood_overlay(hero_instance):    
+    if hero_instance.state == STATE.INJURED:
+        add "images/misc/state_gravely.png" alpha 0.5
+    elif hero_instance.state == STATE.GRAVELY:
+        add "images/misc/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
+        timer 20.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]

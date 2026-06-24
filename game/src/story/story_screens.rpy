@@ -1,41 +1,3 @@
-default saved_music_pos = 0.0
-default saved_music_file = None
-define hovered_note = None
-default journal_notes = [
-    Note("main", "Задачи", "Здесь ты можешь записывать свои мысли."),
-    Note("side", "Заметки", "Здесь можно хранить любую информацию, которая может пригодиться в будущем.")
-]
-define long_fade = Fade(2.0, 0.5, 2.0)
-
-# Основное меню
-screen main_menu():
-    tag menu
-
-    # Добавление вашей картинки на фон
-    add "images/bg/main_menu.png" xsize 1920 ysize 1080
-
-    vbox:
-        xpos 0.06
-        ypos 0.4
-        style_prefix "navigation"
-        spacing 15
-        
-        # Заменяем сложную проверку на простую логику.
-        if renpy.newest_slot(r"^\d.+"):
-            textbutton _("Продолжить") action Continue(confirm=False)
-        if renpy.list_saved_games(fast=True):
-            textbutton _("Новая игра") action Confirm(
-                _("Вы уверены? Это действие безвозвратно удалит ВСЕ текущие сохранения."), 
-                yes=[Function(delete_all_saves), Start()]
-            )
-        else:
-            textbutton _("Новая игра") action Start()
-        textbutton _("Об игре") action ShowMenu("about")
-        textbutton _("Выход") action Quit(confirm=not main_menu)
-
-    fixed:
-        style_prefix "main_menu"
-
 # Оверлей сна
 screen dream_text_overlay(dream_text, display_time):
     # Создаем свою плашку без привязки к системным say_window
@@ -61,15 +23,6 @@ screen dream_text_overlay(dream_text, display_time):
 
     # Таймер закрытия экрана
     timer display_time action Return()
-
-# Оверлей ранения    
-screen blood_overlay(hero_instance):    
-    if hero_instance.state == STATE.INJURED:
-        add "images/misc/state_gravely.png" alpha 0.5
-    elif hero_instance.state == STATE.GRAVELY:
-        add "images/misc/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
-        timer 20.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
-        # $ debuff_stats(hero_instance)
 
 # Модалка выбора персонажа
 screen char_choice():
@@ -151,101 +104,6 @@ screen char_choice():
                         color "#e0e0e0"
                         outlines [ (2, "#000", 0, 0) ]
 
-# Журнал
-screen journal_overlay():
-    zorder 300
-    modal True
-
-    add Solid("#000000AA")
-
-    fixed:
-        align (0.5, 0.15)
-        xysize (1200, 700)
-
-        add "images/misc/notes.png"
-
-        vbox:
-            xpos 100
-            ypos 130
-            spacing 10
-
-            text "Заметки":
-                size 100
-                color "#c30b0b88"
-                font "fonts/char.ttf"
-                outlines [(1, "#5a3c28", 0, 0)]
-
-            for note in journal_notes:
-                button:
-                    xalign 0.15
-                    yalign 0.5
-
-                    background None
-
-                    vbox:
-                        text "◊ [note.title]":
-                            font "fonts/char.ttf"
-                            size (80 if hovered_note == note.id else 70)
-                            color ("#d25a14bc" if hovered_note == note.id else "#2b1a10d0")
-                            outlines [(1, "#82390f", 0, 0)]
-
-                    action Show("note_editor", note=note)
-                    hovered SetVariable("hovered_note", note.id)
-                    unhovered SetVariable("hovered_note", None)
-
-        textbutton "❌":
-            xalign 1.0
-            yalign 0.0
-            xoffset -20
-            yoffset 45
-            text_color "#2b1a10"
-            background None
-            action Hide("journal_overlay")
-
-# Редактирование заметки
-screen note_editor(note):
-    zorder 400
-    modal True
-
-    add Solid("#00000099")
-
-    fixed:
-        align (0.6, 0.26)
-        xysize (1200, 700)
-
-        add "images/misc/notes.png"
-
-        vbox:
-            xpos 100
-            ypos 130
-            spacing 25
-
-            text "[note.title]":
-                font "fonts/char.ttf"
-                size 80
-                color "#a12727"
-                outlines [(1, "#5a3c28", 0, 0)]
-
-            input:
-                value FieldInputValue(note, "text")
-                font "fonts/char.ttf"
-                multiline True
-                length 2000
-                xysize (960, 420)
-                color "#2b1a10"
-                size 60
-                outlines [(1, "#82390f", 0, 0)]
-
-        textbutton "❌":
-            xpos 980
-            ypos 600
-            text_size 30
-            text_color "#2b1a10"
-            background None
-            action Hide("note_editor")
-        
-        key "K_ESCAPE" action Hide("note_editor")
-
 # Экран смерти
 label hero_died:
     image death_message = Text("ВАШ ПУТЬ ОКОНЧЕН", style="death_style")
@@ -274,18 +132,16 @@ label hero_died:
     return
 
 # Сцена сна
-label dream_scene(texts_start = [], horror_char = None, texts_horror = [],  texts_end = [], show_gui_after = None):
+label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts_end = [], show_gui_after = True, finish_nightmare = True):
     hide screen gui
     with fade
 
     $ renpy.show("black", zorder=-100)
 
-    $ start_dream_effect()
+    $ start_dream_effect(finish_nightmare)
 
     $ old_skip = preferences.skip_unseen
     $ preferences.skip_unseen = False
-
-    with long_fade
 
     python:
         for text in texts_start:
@@ -311,12 +167,11 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [],  text
     hide horror_character
     with dissolve
 
-    $ long_fade(2.0)
-
     if show_gui_after:
         show screen gui(hero)
         with fade
 
-    $ stop_dream_effect()
+    if finish_nightmare:
+        $ stop_dream_effect(finish_nightmare)
 
     $ preferences.skip_unseen = old_skip

@@ -10,12 +10,6 @@ style horror_style:
     size 32
     color "#e32416"
 
-# Стиль проверки характеристики
-style check_style:
-    font "fonts/check.ttf"
-    size 32
-    color "#1ae9db"
-
 # Стиль на экране смерти
 style death_style:
     font "fonts/dream.ttf"

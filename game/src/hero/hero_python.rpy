@@ -99,14 +99,14 @@ init python:
 
     def add_stat(hero_object, stat_name, value):
         if (getattr(hero_object, stat_name) < 10):
-            renpy.sound.play("audio/fx/fx_stat_buff.mp3") 
+            # renpy.sound.play("audio/fx/fx_stat_buff.mp3") 
             current_value = getattr(hero_object, stat_name)
             setattr(hero_object, stat_name, current_value + value)
 
 
     def reduce_stat(hero_object, stat_name, value):
         if (getattr(hero_object, stat_name) > 0):
-            renpy.sound.play("audio/fx/fx_stat_debuff.mp3") 
+            # renpy.sound.play("audio/fx/fx_stat_debuff.mp3") 
             current_value = getattr(hero_object, stat_name)
             setattr(hero_object, stat_name, current_value - value)
     

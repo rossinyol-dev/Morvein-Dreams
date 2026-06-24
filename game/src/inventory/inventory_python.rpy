@@ -110,11 +110,19 @@ init python:
                 return item
         return None
 
+    def has_inventory_item(item_id):
+        return get_inventory_item(item_id) is not None
+
     def get_gold_count():
         coins = get_inventory_item("coins")
         if coins:
             return coins.count
         return 0
+
+    def remove_all_gold():
+        coins = get_inventory_item("coins")
+        if coins:
+            coins.count = 0
 
     def add_or_stack_item(new_item):
         existing = get_inventory_item(new_item.id)
