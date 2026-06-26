@@ -59,3 +59,8 @@ transform dream_shadow:
         linear 3 zoom 1.02 alpha 0.6
         linear 3 zoom 1.03 alpha 0.8
         repeat
+
+# Фейдаут фона в черное
+transform smooth_fade_out:
+    alpha 0.0
+    linear 3.0 alpha 1.0

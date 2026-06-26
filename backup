@@ -1,0 +1,11 @@
+window hide
+
+# Показываем сплошной черный цвет на слое master, 
+# применяя наш трансформ smooth_fade_out
+show expression "#000" as black_screen at smooth_fade_out
+
+hide screen blood_overlay
+with dissolve
+
+# Ждем 3 секунды, пока черный цвет плавно заливает экран
+$ renpy.pause(10.0, hard=True)

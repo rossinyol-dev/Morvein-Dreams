@@ -1,4 +1,6 @@
-﻿init python:
+﻿define slow_dissolve = Dissolve(4.5)
+
+init python:
     import enum
     import pygame_sdl2 as pygame
     import random
@@ -80,7 +82,7 @@
 
         renpy.show(scene_name, layer="master", at_list=[fade_in_from_black(delay)])
         renpy.pause(delay, hard=True)
-
+        
     def dream_scene_dynamic(st, at, image_name):
         global dream_alpha
 
@@ -175,3 +177,27 @@
 
         return old_say(who, what, *args, **kwargs)
     renpy.say = dream_say
+    
+    def fade_to_black(fade_time=3.0, pause_time=5.0, hide_screen=None):
+        """
+        Полностью рабочая функция. Принимает аргументы, но использует 
+        твой стабильный статичный трансформ.
+        """
+        # Скрываем интерфейс диалогов
+        renpy.with_statement(None)
+        renpy.hide_screen("say")
+        _window_hide(None)
+        
+        # Показываем черный цвет, используя твой рабочий трансформ smooth_fade_out
+        renpy.show("black_screen", what=renpy.display.image.Solid("#000"), layer="master", at_list=[smooth_fade_out])
+        
+        # Скрываем кровь (или другой экран), если передано имя
+        if hide_screen is not None:
+            renpy.hide_screen(hide_screen)
+            renpy.with_statement(dissolve)
+        else:
+            renpy.with_statement(None)
+            
+        # Считаем общую паузу на основе переданных ТОБОЙ чисел
+        total_pause = fade_time + pause_time
+        renpy.pause(total_pause, hard=True)
