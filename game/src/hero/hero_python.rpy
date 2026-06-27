@@ -31,11 +31,11 @@ define control_desc = [
 ]
 
 define aspect_colors = [
-    "#150b19", 
-    "#55026b", 
-    "#8301ab",
-    "#a600dd",
-    "#cc00ff",
+    "#44004b", 
+    "#790287", 
+    "#aa03bd",
+    "#ce00e5",
+    "#e600ff",
 ]
 
 define mercy_colors = [

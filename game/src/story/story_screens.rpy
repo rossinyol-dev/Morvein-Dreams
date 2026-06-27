@@ -145,7 +145,7 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts
 
     python:
         for text in texts_start:
-            horror(text)
+            dream(text)
             renpy.pause(2.0, hard=True)
 
     if texts_horror:
@@ -175,3 +175,25 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts
         $ stop_dream_effect(finish_nightmare)
 
     $ preferences.skip_unseen = old_skip
+
+screen tutorial_text(message):
+    zorder 1000
+    modal False
+
+    frame:
+        xalign 0.5
+        yalign 0.82
+        xmaximum 1200
+        yminimum 150
+
+        background Solid("#000000CC")
+        padding (35, 28)
+
+        text message:
+            xalign 0.5
+            yalign 0.5
+            text_align 0.5
+            font "fonts/char.ttf"
+            size 34
+            color "#e6d2aa"
+            outlines [(2, "#000000", 0, 0)]

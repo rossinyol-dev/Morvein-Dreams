@@ -11,7 +11,7 @@ init python:
     config.layers = [ "background", "master", "transient", "screens", "overlay" ]
     dream_alpha = 0.8
     dream_active = True
-    dream_text_min_limit = 3
+    dream_text_min_limit = 6
     greek_map = {
         "а": "α",
         "е": "ε",
@@ -61,7 +61,7 @@ init python:
             resume_music()
         renpy.layer_at_list([], layer="master")
 
-    def hard_fade(scene_name, delay=3.0, texts = None):
+    def hard_fade(scene_name, delay=3.0, texts = None, show_gui=True):
         renpy.stop_skipping()
 
         renpy.hide_screen("say")
@@ -82,6 +82,9 @@ init python:
 
         renpy.show(scene_name, layer="master", at_list=[fade_in_from_black(delay)])
         renpy.pause(delay, hard=True)
+
+        if show_gui:
+            renpy.show_screen("gui")
         
     def dream_scene_dynamic(st, at, image_name):
         global dream_alpha

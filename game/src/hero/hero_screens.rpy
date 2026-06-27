@@ -32,12 +32,12 @@ screen char_stats():
 
                     text "[hero.name]"
                     text "[hero.prof.value]"
-                    text "[hero_state_desc(hero.state)]"
 
                 vbox:
                     spacing 20
                     yoffset -50
 
+                    text "[hero_state_desc(hero.state)]"
                     text "[stat_desc(hero.mercy, mercy_desc, mercy_colors)]"
                     text "[stat_desc(hero.reason, reason_desc, reason_colors)]"
                     text "[stat_desc(hero.aspect, aspect_desc, aspect_colors)]"
