@@ -612,55 +612,55 @@ label act_1_archives_explore:
             narrator "Ты приходишь в себя после видения."
             narrator ""
 
-            menu:
-                "Продолжить изучение":
-                    if (order_history_explored_flag == True):
-                        narrator "Ты понимаешь, что видел этот знак на грудни незнакомца совсем недавно — при изучении хроник Морвейна."
-                        narrator "Знак принадлежит дому Триллианов — одному из старейших и влиятельнийших домов города."
-                        narrator "У Триллианов есть своя гигантская библиотека, в которой наверняка могут храниться сведения о Морвейне доорденских времен."
-                        narrator "Кажется, настало время нанести визит их потомку и распросить его."
-                    else:
-                        narrator "Еще через час безрезультатных поисков ты понимаешь, что сегодня уже не узнаешь ничего нового."
-                        narrator "Разочарованно ты выходишь из архива."
+    menu:
+        "Продолжить изучение":
+            if (order_history_explored_flag == True):
+                narrator "Ты понимаешь, что видел этот знак на грудни незнакомца совсем недавно — при изучении хроник Морвейна."
+                narrator "Знак принадлежит дому Триллианов — одному из старейших и влиятельнийших домов города."
+                narrator "У Триллианов есть своя гигантская библиотека, в которой наверняка могут храниться сведения о Морвейне доорденских времен."
+                narrator "Кажется, настало время нанести визит их потомку и распросить его."
+            else:
+                narrator "Еще через час безрезультатных поисков ты понимаешь, что сегодня уже не узнаешь ничего нового."
+                narrator "Разочарованно ты выходишь из архива."
 
-            $ dream_char("cornelius default", [center])
+    $ dream_char("cornelius default", [center])
 
-            narrator "Ты возвращаешься к архиварусу."
-            narrator "Старик тихо посапывает."
+    narrator "Ты возвращаешься к архиварусу."
+    narrator "Старик тихо посапывает."
 
-            menu:
-                "Вернуть книги":
-                    edmund "Спасибо, бро!"
+    menu:
+        "Вернуть книги":
+            edmund "Спасибо, бро!"
 
-            if girl_picture_found_flag:
+    if girl_picture_found_flag:
+        menu:
+            "Упомянуть про картинку":
+                narrator "Старик смущенно улыбается."
+                edmund "Ах, это... Когда-то и я был молод."
+                edmund "Можешь оставить себе, если хочешь."
+
                 menu:
-                    "Упомянуть про картинку":
-                        narrator "Старик смущенно улыбается."
-                        edmund "Ах, это... Когда-то и я был молод."
-                        edmund "Можешь оставить себе, если хочешь."
+                    "Вернуть картинку":
+                        narrator "Тебе кажется, что на секунду в глазах Эдмунда ты видишь ностальгическую слезу."
+                        edmund "Спасибо, юноша, что на время вернул старика в прошлое."
+                        $ remove_item("girl_picture")
+                        $ add_stat(hero, "mercy", 1)
+                    "Оставить картинку":
+                        narrator "Старик подмигивает тебе."
+                        edmund "Она не раз согреет тебя холодными ночами."
 
-                        menu:
-                            "Вернуть картинку":
-                                narrator "Тебе кажется, что на секунду в глазах Эдмунда ты видишь ностальгическую слезу."
-                                edmund "Спасибо, юноша, что на время вернул старика в прошлое."
-                                $ remove_item("girl_picture")
-                                $ add_stat(hero, "mercy", 1)
-                            "Оставить картинку":
-                                narrator "Старик подмигивает тебе."
-                                edmund "Она не раз согреет тебя холодными ночами."
+    edmund "Надеюсь, ты нашел, что искал."
 
-            edmund "Надеюсь, ты нашел, что искал."
+    $ hide_dream_char("cornelius default")
 
-            $ hide_dream_char("cornelius default")
+    narrator "Настало время продолжить расследование."
 
-            narrator "Настало время продолжить расследование."
+    menu:
+        "Отправиться к усадьбе Триллианов" if trillian_seal_found_flag or order_history_explored_flag:
+            jump act_1_rykard_gang_counter
 
-            menu:
-                "Отправиться к усадьбе Триллианов" if trillian_seal_found_flag or order_history_explored_flag:
-                    jump act_1_rykard_gang_counter
-
-                "Искать улики на улице" if not (trillian_seal_found_flag or order_history_explored_flag):
-                    jump act_1_investigation_streets
+        "Искать улики на улице" if not (trillian_seal_found_flag or order_history_explored_flag):
+            jump act_1_investigation_streets
 
 label act_1_archives_agatha_quest:
     $ hard_fade("morvein_streets")
