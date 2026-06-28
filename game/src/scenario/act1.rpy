@@ -175,8 +175,7 @@ label act_1_investigation_tavern:
     jump act_1_investigation_well_alley
 
 label act_1_investigation_well_alley:
-    scene morvein_well_alley
-    with fade
+    $ hard_fade("morvein_well_alley")
 
     narrator "Ты следуешь за фигурой в плаще по узким переулкам квартала мастеров." 
     narrator "Незнакомец идёт впереди, не оглядываясь, и вскоре выводит тебя к старому колодцу в одном из заброшенных дворов."
@@ -204,7 +203,7 @@ label act_1_investigation_well_alley:
 
     $ hard_fade("morvein_well_alley")
 
-    if hero.control > 10:
+    if hero.control > 5:
         narrator "В последний момент ты приходишь в себя и с ужасом понимаешь, что еще секунда — и ты упал бы головой вниз."
         narrator "Ты поспешно отстраняешься назад и разворачиваешься, приваливаясь спиной к колодцу."
         narrator "Незнакомца нигде не видно.."
@@ -246,43 +245,31 @@ label act_1_investigation_well_alley:
     jump act_1_investigation_after_well
 
 label act_1_investigation_after_well:
-    scene morvein_tavern
-    with fade
+    $ hard_fade("morvein_tavern")
 
-    narrator "В таверну вы возвращаетесь уже без прежней осторожности. Дождь стекает с твоего плаща на пол, плечо ноет после падения, а в горле всё ещё стоит влажный холод колодца."
-    narrator "Трактирщик запирает дверь на засов и только потом позволяет себе выдохнуть."
-    narrator "Ты не садишься. Вопрос сам находит дорогу раньше, чем ты успеваешь решить, стоит ли задавать его вслух."
-    narrator "— Этой ночью. Ты слышал что-нибудь необычное рядом с тем колодцем?"
-    narrator "Трактирщик медлит. Его взгляд скользит к окнам, за которыми дождь превращает улицу в тёмное пятно."
-    narrator "— Думал, показалось. Ближе к третьему часу кто-то ходил во дворе. Медленно. Будто босиком по мокрому камню."
-    narrator "Он стискивает в руках край стойки."
-    narrator "— Потом скрипнул ворот. Старый, ржавый. Я ещё решил, что ветер зацепил цепь."
-    narrator "Ты вспоминаешь темноту внизу и то, как она тянулась к твоему лицу."
-    narrator "— Был ещё звук, — добавляет трактирщик тише. — Не ведро. Тяжелее. Словно кто-то спускался по стене и задел камень."
-    narrator "Ты не говорил ему о следах у колодца. Не говорил, что они обрывались у самого края."
-    narrator "Теперь сомнений почти не остаётся: этой ночью кто-то действительно был там. И колодец был не местом, куда приходили за водой."
-    narrator "Он был входом."
-    narrator "Но если внизу и существовал путь, сейчас он молчал. Зов исчез, оставив после себя только мокрые следы, холод и чужое внимание."
-    narrator "Трактирщик хочет сказать что-то ещё, но в этот момент у двери раздаётся короткий стук."
-    narrator "Не громкий. Не настойчивый. Такой стук не просит открыть — он сообщает, что за дверью уже знают, кто внутри."
+    narrator "Ты возвразаешься в таверну с Альбертом."
+    narrator "Ты рассказываешь трактирщику Виллему об увиденном тобой."
+    narrator "Тот с ужасом припоминает, что слышал той ночью какие-то звуки возле колодца неподалеку."
+    narrator "По лицу героя трактирщик понимает, что герой намерен туда отправиться - и просит его подготовиться."
+    narrator "Герой отправляется к торговцу."
 
     jump act_1_investigation_merchant_shop
 
 label act_1_investigation_merchant_shop:
-    scene morvein_merchant_shop
-    with fade
+    $ hard_fade("morvein_merchant_shop")
 
     narrator "Ты начинаешь торговлю."
 
     call screen merchant_shop
 
+    narrator "Ты покупаешь все необходимо для спуска."
     narrator "Ты завершаешь торговлю"
+    narrator "Ты отправляешься к колодцу."
 
     jump act_1_investigation_well_descent
 
 label act_1_investigation_well_descent:
-    scene morvein_well_alley
-    with fade
+    $ hard_fade("morvein_well_alley")
 
     "Ты готовишься спуститься в колодец."
     "Ты спускаешься в колодец."
@@ -290,22 +277,36 @@ label act_1_investigation_well_descent:
     jump act_1_investigation_inside_well
 
 label act_1_investigation_inside_well:
-    scene morvein_well_alley
-    with fade
+    $ hard_fade("morvein_inside_well")
 
     narrator "Ты внути колодца."
-    narrator "Ты находишь всякую страшную херню."
+    narrator "Ты видишь внутри арку со странными символами, которые почти потухли."
+    narrator "Ты видишь под аркой тяжелую каменную плиту, котрая недавно явно двигалась."
+    narrator "У тебя не получается ее ни открыть, ни сдвинуть с места."
+    narrator "Ты делаешь предположение, что она открывается только ночью."
 
-    jump act_1_investigation_exit_well
-
-label act_1_investigation_exit_well:
-    scene morvein_well_alley
-    with fade
+    $ hard_fade("morvein_well_alley")
 
     narrator "Ты вылезаешь из колодца."
-    narrator "Тебе вручают письмо"
+    narrator "Тебе возвращаешься в таверну."
 
-    jump act_1_rykard_first_meeting
+    jump act_1_investigation_tavern_meeting
+
+label act_1_investigation_tavern_meeting:
+    $ hard_fade("morvein_tavern")
+
+    narrator "Ты идешь с Альбертом в таверну."
+    narrator "Ты обсуждаешь с ним и Виллемом увиденное."
+
+    $ dream_char("rykard_guard_unarmed")
+
+    narrator "К вам посаживается незнакомец."
+    narrator "Ты спрашиваешь, почему он заманил тебя в ловушку."
+    narrator "Тот сухо говорит, что не имеет привычки попусту ходить по бедным кварталам."
+    narrator "Он продолжает, что его хозяин внимательно следил за действиями героя."
+    narrator "Он вручает приглашение ко встрече с Рикардом."
+
+    jump act_1_rykard_gang_counter
 
 label act_1_archives_council:
     $ change_music("audio/temple_council.mp3")
@@ -498,8 +499,7 @@ label act_1_singer_found:
     jump act_1_archives_explore
 
 label act_1_archives_explore:
-    scene temple_archives
-    with fade
+    $ hard_fade("temple_archives")
 
     narrator "Ты заходишь в пыльное простанство архивов и видишь перед собой ветхого подслеповатого старика."
     narrator "Кажется, что древние книги, уходящие бесконечным рядами вдаль, приходятся ему ровесниками."
@@ -663,8 +663,7 @@ label act_1_archives_explore:
                     jump act_1_investigation_streets
 
 label act_1_archives_agatha_quest:
-    scene morvein_streets_mix
-    with fade
+    $ hard_fade("morvein_streets")
 
     narrator "Ты идешь к тайному месту."
     narrator "Ты видишь Агату"
@@ -680,17 +679,17 @@ label act_1_archives_agatha_quest:
                     if hero.control > 3:
                         "Ты хватаешь ее."
                         $ agatha_arrested_flag = True
-                        jump act_1_archives_agatha_quest_final
+                        jump act_1_archives_agatha_quest_end
                     else:
                         "Ты упускаешь ее."
                 "Отпустить ее":
                     "Ты отпускаешь ее."
                     $ agatha_release_flag = True
-                    jump act_1_archives_agatha_quest_final
+                    jump act_1_archives_agatha_quest_end
         "Схватить ее":
             "Ты упускаешь ее."
             $ agatha_runaway_flag = True
-            jump act_1_archives_agatha_quest_final
+            jump act_1_archives_agatha_quest_end
     
     narrator "Агата кидает тебе в лицо непонятный порошок и убегает."
     
@@ -717,16 +716,16 @@ label act_1_archives_agatha_quest:
     else:
         $ agatha_runaway_flag = True
 
-    jump act_1_archives_agatha_quest_final
+    jump act_1_archives_agatha_quest_end
 
-label act_1_archives_agatha_quest_final:
+label act_1_archives_agatha_quest_end:
     scene temple_council
     with fade
 
     show edmund default at center
     with dissolve
 
-    if agatha_arrested_flag == False:
+    if agatha_arrested_flag:
         edmund "Мы довольны, го в архив"
         jump act_1_archives_explore
     else:
@@ -797,7 +796,7 @@ label act_1_rykard_before_mansion:
     jump act_1_rykard_house
 
 label act_1_rykard_house:
-    $ hard_fade("trillian drawing room")
+    $ hard_fade("trillian_drawing_room")
 
     $ dream_char("rykard default", [center])
 
@@ -888,29 +887,65 @@ label act_1_path_choice:
     menu:
         "Отправиться в храм с Рикардом":
             jump act_1_rykard_ancient_temple
-        "Сдать заговорщиков Ордену":
+        "Сдать Рикарда Ордену":
             jump act_1_rykard_arrest
 
     jump act_1_path_choice
 
 
 label act_1_rykard_arrest:
-    $ hard_fade("")
+    $ hard_fade("trillian_drawing_room")
+
+    narrator "Герой говорит Рикарду, что ему нужно немного подумать."
+    narrator "Герой покидает особняк Триллианов."
+
+    $ hard_fade("temple_council")
+
+    $ dream_char("edmund default", [center])
+
+    narrator "Герой возвращается в Совет и требует срочной аудиенции."
+    narrator "Герой сообщает, что Рикард знает о существе под Морвейном."
+    narrator "Герой сообщает, что Рикард собирался вести его к этому существу."
+    narrator "Герой говорит, что намерения Рикарда неясны."
+    narrator "Совет решает, что в текущем кризисе не может рисковать."
+    narrator "Совет отправляет стражу за Рикардом."
+
+    $ dream_char("rykard default", [center])
+
+    narrator "Вскоре Рикарда приводят в зал Совета."
+    narrator "Совет требует от Рикарда объяснений."
+    narrator "Рикард говорит, что Орден боится не его, а правды."
+    narrator "Совет приказывает задержать Рикарда до выяснения обстоятельств."
+
+    jump act_1_rykard_interrogation
+
+label act_1_rykard_interrogation:
+    $ hard_fade("temple_interrogation_room")
+
+    narrator "Рикарда уводят на допрос."
+    narrator "Герой слышит начало допроса из-за двери."
+    narrator "Совет требует от Рикарда рассказать путь к существу под Морвейном."
+    narrator "Рикард отвечает, что Орден и так знает путь."
+    narrator "За дверью раздается удар."
+    narrator "Рикард говорит, что герой все равно узнает правду."
+    narrator "Герой понимает, что теперь пойдет в храм вместе с Орденом."
+    narrator "Герой понимает, что сомнения никуда не исчезли."
+
+    jump act_1_order_ancient_temple
 
 label act_1_rykard_ancient_temple:
     $ hard_fade("morvein_ancient_temple")
 
     $ dream_char("rykard default", [center])
 
-    narrator "Ты идешь в храм с культистами."
+    narrator "Ты идешь в храм с Рикардом."
 
     return
 
 label act_1_order_ancient_temple:
-    scene red
-    with fade
+    $ hard_fade("morvein_ancient_temple")
 
-    $ dream_char("rykard default", [center])
+    $ dream_char("edmund default", [center])
 
     narrator "Ты идешь в храм с Орденом."
 

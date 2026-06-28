@@ -29,6 +29,7 @@ image temple_bed_view = im.Scale("bg/temple_bed_view.png", 1920, 1080)
 image temple_singer_cell = im.Scale("bg/temple_singer_cell.png", 1920, 1080)
 image temple_underground_choir = im.Scale("bg/temple_underground_choir.png", 1920, 1080)
 image temple_before_underground_choir = im.Scale("bg/temple_before_underground_choir.png", 1920, 1080)
+image temple_interrogation_room = im.Scale("bg/temple_interrogation_room.png", 1920, 1080)
 
 image trillian_house = im.Scale("bg/trillian_house.png", 1920, 1080)
 image trillian_drawing_room = im.Scale("bg/trillian_drawing_room.png", 1920, 1080)
