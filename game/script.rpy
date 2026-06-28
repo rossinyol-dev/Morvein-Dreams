@@ -40,5 +40,4 @@ label start:
         portrait = "...",
         color="#000000")
 
-    call prologue
-    return
+    jump prologue

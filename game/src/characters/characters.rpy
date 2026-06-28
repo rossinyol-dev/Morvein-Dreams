@@ -15,6 +15,7 @@ image girl horror = Transform("images/chars/girl_horror.png", zoom=0.7)
 image rykard guard unarmed = Transform("images/chars/rykard_guard_unarmed.png", zoom=0.7)
 image rykard guard armed = Transform("images/chars/rykard_guard_armed.png", zoom=0.7)
 image temple guard defalut = Transform("images/chars/temple_guard.png", zoom=0.7)
+image albert default = Transform("images/chars/albert_default.png", zoom=0.7)
 
 # Персонажи
 define narrator = Character()

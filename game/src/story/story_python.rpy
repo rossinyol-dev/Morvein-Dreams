@@ -44,21 +44,19 @@ init python:
         "Х": "Χ",
     }
 
-    def start_dream_effect(finish_nightmare = True):
-        if (finish_nightmare == True):
-            pause_music()
-            renpy.sound.play("audio/fx/horror_bell.mp3")
-            renpy.music.play(
-                "audio/dream_theme.mp3",
-                fadein=2.0
-            )
+    def start_dream_effect():
+        pause_music()
+        renpy.sound.play("audio/fx/horror_bell.mp3")
+        renpy.music.play(
+            "audio/dream_theme.mp3",
+            fadein=2.0
+        )
         renpy.show("black", layer="background")
         renpy.layer_at_list([slow_shaking], layer="master")
 
-    def stop_dream_effect(finish_nightmare = True):
-        if (finish_nightmare == True):
-            renpy.music.stop(fadeout=2.0)
-            resume_music()
+    def stop_dream_effect():
+        renpy.music.stop(fadeout=2.0)
+        resume_music()
         renpy.layer_at_list([], layer="master")
 
     def hard_fade(scene_name, delay=3.0, texts = None, show_gui=True):
@@ -102,6 +100,8 @@ init python:
         )
 
         return d, 0.1
+
+        fade_to_black()
 
     def dream_char(image_name, pos=None, z=10, transition=dissolve):
         if pos is None:
@@ -204,3 +204,23 @@ init python:
         # Считаем общую паузу на основе переданных ТОБОЙ чисел
         total_pause = fade_time + pause_time
         renpy.pause(total_pause, hard=True)
+
+    def start_act(title, subtitle, act_num, scene):
+        renpy.play("audio/act_start.mp3", "music")
+
+        renpy.hide_screen("gui")
+        renpy.hide_screen("say")
+        renpy.hide_screen("quick_menu")
+
+        renpy.scene(layer="screens")
+        renpy.scene(layer="overlay")
+        renpy.scene(layer="master")
+
+        renpy.show("black", layer="master")
+        renpy.with_statement(fade)
+
+        renpy.take_screenshot()
+        renpy.save("1-[act_num]", "Начало [act_num] акта")
+        renpy.call("show_act_title", "АКТ I", "ТАЙНА")
+
+        renpy.jump(scene)

@@ -131,14 +131,38 @@ label hero_died:
     
     return
 
+# Экран смерти
+label to_be_continued:
+    image tbc_message = Text("ПРОДОЛЖЕНИЕ СЛЕДУЕТ", style="death_style")
+
+    # Скрываем экран с кровью, так как персонаж уже мертв
+    hide screen gui
+
+    scene black with fade 
+
+    # Показываем текст ниже картинки (xalign 0.5 отцентрирует по горизонтали)
+    show expression "images/misc/hourglass.png" at Transform(xalign=0.5, yanchor=0.5, ypos=0.40)
+    show tbc_message at Transform(xalign=0.5, yanchor=0.5, ypos=0.80)
+    
+    # Обязательно добавляем паузу, иначе игра сразу закроется!
+    # Игрок увидит картинку с текстом и сможет нажать клик для выхода.
+    $ renpy.pause()
+
+    $ renpy.take_screenshot()
+    $ renpy.save("1-2", "Начало 2 акта")
+
+    call show_act_title("АКТ II", "ЗОВ")
+    
+    return
+
 # Сцена сна
-label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts_end = [], show_gui_after = True, finish_nightmare = True):
+label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts_end = [], show_gui_after = True):
     hide screen gui
     with fade
 
     $ renpy.show("black", zorder=-100)
 
-    $ start_dream_effect(finish_nightmare)
+    $ start_dream_effect()
 
     $ old_skip = preferences.skip_unseen
     $ preferences.skip_unseen = False
@@ -171,10 +195,11 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts
         show screen gui(hero)
         with fade
 
-    if finish_nightmare:
-        $ stop_dream_effect(finish_nightmare)
+    $ stop_dream_effect()
 
     $ preferences.skip_unseen = old_skip
+
+    return
 
 screen tutorial_text(message):
     zorder 1000
@@ -197,3 +222,56 @@ screen tutorial_text(message):
             size 34
             color "#e6d2aa"
             outlines [(2, "#000000", 0, 0)]
+
+transform act_title_fade:
+    alpha 0.0
+    yoffset 18
+    ease 1.4 alpha 1.0 yoffset 0
+    pause 1.4
+    ease 1.0 alpha 0.0 yoffset -12
+
+screen act_title_screen(act_title, act_subtitle=None, display_time=3.8):
+    zorder 1000
+    modal True
+
+    add Solid("#000000")
+
+    button:
+        xfill True
+        yfill True
+        background None
+        action Return()
+
+    vbox at act_title_fade:
+        xalign 0.5
+        yalign 0.48
+        spacing 28
+
+        text act_title:
+            xalign 0.5
+            text_align 0.5
+            font "fonts/char.ttf"
+            size 72
+            color "#d8c08a"
+            outlines [(2, "#000000", 0, 0)]
+
+        add Solid("#8b1f1f"):
+            xalign 0.5
+            xsize 420
+            ysize 2
+
+        if act_subtitle:
+            text act_subtitle:
+                xalign 0.5
+                text_align 0.5
+                font "fonts/char.ttf"
+                size 34
+                color "#d9d2c0"
+                outlines [(2, "#000000", 0, 0)]
+
+    timer display_time action Return()
+
+label show_act_title(act_title, act_subtitle=None, display_time=3.8):
+    hide screen gui
+    call screen act_title_screen(act_title, act_subtitle, display_time)
+    return
