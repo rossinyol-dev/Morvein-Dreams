@@ -23,8 +23,6 @@ label prologue:
             reason = 4, 
             aspect = 2, 
             control = 8, 
-            ord_rel = 3, 
-            cult_rel = 0, 
             image = "images/chars/hero_milton_idle.png",
             portrait = "images/chars/hero/hero_milton_portrait.png",
             color="#ce0c0c")
@@ -42,8 +40,6 @@ label prologue:
             reason = 7, 
             aspect = 0, 
             control = 3, 
-            ord_rel = 0, 
-            cult_rel = 0, 
             image = "images/chars/hero_falk_idle.png", 
             portrait = "images/chars/hero/hero_falk_portrait.png",
             color="#ce0c0c")

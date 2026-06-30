@@ -221,6 +221,6 @@ init python:
 
         renpy.take_screenshot()
         renpy.save("1-[act_num]", "Начало [act_num] акта")
-        renpy.call("show_act_title", "АКТ I", "ТАЙНА")
+        renpy.call("show_act_title", title, subtitle)
 
-        renpy.jump(scene)
+        return scene

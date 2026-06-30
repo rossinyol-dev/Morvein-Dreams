@@ -16,3 +16,8 @@ define config.keymap['quick_save'] = []
 define config.keymap['quick_load'] = []
 define config.default_textshader = "typewriter"
 
+define gui.text_font = "fonts/main/main-regular.otf"
+define gui.interface_text_font = "fonts/main/main-regular.otf"
+define gui.label_text_font = "fonts/main/main-regular.otf"
+define gui.name_text_font = "fonts/main/main-regular.otf"
+define gui.text_size = 38

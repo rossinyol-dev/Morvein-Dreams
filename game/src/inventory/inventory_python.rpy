@@ -31,6 +31,9 @@ init python:
         if item.id == "potion_energy":
             use_potion_energy(item)
             remove_one_item(item)
+        if item.id == "potion_dream":
+            use_potion_dream(item)
+            remove_one_item(item)
         if item.id == "potion_hp":
             set_hero_state(hero, STATE.HEALTHY)
             remove_one_item(item)
@@ -103,6 +106,10 @@ init python:
     def use_potion_energy(item):
         if item.count > 0:
             reduce_aspect(hero)
+
+    def use_potion_dream(item):
+        if item.count > 0:
+            add_aspect(hero)
 
     def get_inventory_item(item_id):
         for item in inventory_items:

@@ -15,6 +15,9 @@ default singer_saved_flag = False
 default hero_saved_by_guard = False
 default choir_notes_found_flag = False
 
+# Флаги готовности
+default finished_act = False
+
 # Точка входа
 label start:
     $ quick_menu = debug
@@ -34,8 +37,6 @@ label start:
         reason = 0, 
         aspect = 0, 
         control = 0, 
-        ord_rel = 0, 
-        cult_rel = 0, 
         image = "...",
         portrait = "...",
         color="#000000")
