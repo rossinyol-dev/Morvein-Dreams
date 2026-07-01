@@ -298,8 +298,99 @@ label act_1_investigation_after_well:
     menu:
         "Настоять на ночной вылазке":
             narrator "Ты твердо заявляешь, что ждать до утра нельзя — следы свежие, и упускать зацепку глупо."
-            willem "Эх, упрямый ты человек. Ладно, удерживать не стану, но хотя бы возьми факел."
+            willem "Эх, упрямый ты человек. Ладно, удерживать не стану, но отправитесь не раньше ночи."
             willem "Альберт пойдет с тобой. Вдруг снова что-то случится."
+            willem "А сейчас — оставайтесь послушать выступление."
+
+    hide willem default with dissolve
+
+    jump act_1_investigation_tavern_song
+
+label act_1_investigation_tavern_song:
+    $ change_music("audio/tavern_ballad.mp3", 6.0, 1.5)
+    $ dream_char("mistrel default", [center])
+    hide screen gui with dissolve(2.0)
+    show screen soft_vignette(5.0)
+
+    window show
+    narrator "На маленькое возвышение у дальней стены поднимается девушка с лютней в руках.{w=4.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    window show
+    narrator "Пьяные посетители провожают ее взглядами слишком жадно, будто уже решили, какой будет песня.{w=4.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    window show
+    narrator "Кто-то свистит. Кто-то требует плясовую. Лотар поднимает кружку и хохочет громче остальных.{w=4.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    window show
+    narrator "Девушка склоняет голову, касается струн, и первый аккорд проходит сквозь шум, как трещина по стеклу.{w=4.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    window show
+    narrator "Где месяц белеет над черной водой,{w=3.5}{nw}"
+    window hide
+    $ renpy.pause(1.5, hard=True)
+
+    window show
+    narrator "Где спящие бродят неверной тропой,{w=3.5}{nw}"
+    window hide
+    $ renpy.pause(1.5, hard=True)
+
+    window show
+    narrator "Там голос зовет из глубинной тиши,{w=3.5}{nw}"
+    window hide
+    $ renpy.pause(1.5, hard=True)
+
+    window show
+    narrator "И просит: не бойся, глаза не туши,{w=3.5}{nw}"
+    window hide
+    $ renpy.pause(1.5, hard=True)
+
+    window show
+    narrator "Пока не вернутся домой корабли.{w=3.5}{nw}"
+    window hide
+    $ renpy.pause(1.5, hard=True)
+
+    window show
+    narrator "Ты сам не замечаешь, как перестаешь думать о колодце, о следах внизу и о человеке в капюшоне.{w=5.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    window show
+    narrator "Песня не прогоняет тревогу. Она делает ее странно красивой, будто боль можно на время удержать в ладонях.{w=5.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    window show
+    narrator "Постепенно зал смолкает. Кружки застывают в руках, разговоры обрываются, даже Виллем перестает протирать стойку.{w=5.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    window show
+    narrator "У кого-то блестят глаза. Лотар приподнимается над столом и слушает так, словно боится пропустить хоть одну ноту.{w=5.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    window show
+    narrator "Последняя нота гаснет, и несколько мгновений никто не решается нарушить тишину.{w=4.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    window show
+    narrator "Потом зал взрывается комплиментами. Девушка улыбается, кланяется и исчезает так же тихо, как появилась.{w=4.5}{nw}"
+    window hide
+    $ renpy.pause(2.0, hard=True)
+
+    hide screen soft_vignette
+    with Dissolve(5.0)
+
+    narrator "Ты уходишь один к колодцу."
 
     jump act_1_investigation_well_descent
 
@@ -863,32 +954,8 @@ label act_1_rykard_gang_counter:
             narrator "Наконец главарь сплевывает на мостовую и отступает."
             narrator "Остальные следуют его примеру."
             narrator "Агата не произносит ни слова. Просто идет дальше, будто ничего не произошло."
+
             jump act_1_rykard_before_mansion
-
-        if agatha_runaway_flag:
-            narrator "Главарь останавливается прямо перед тобой и улыбается так, словно вы старые знакомые."
-            narrator "От него пахнет дешевым элем, мокрой кожей и холодным железом."
-            narrator "Он говорит негромко, почти дружелюбно, но двое за твоей спиной уже стоят слишком близко."
-            narrator "В такие часы на улицах Морвейна никто не задает лишних вопросов. Никто не выглядывает из окон. Никто не спешит на помощь."
-            narrator "Главарь кивает на твой кошель."
-            narrator "Цена прохода оказывается простой: все, что у тебя есть."
-
-            menu:
-                "Отдать все деньги":
-                    narrator "Ты медленно достаешь кошель и бросаешь его на мокрую мостовую."
-                    narrator "Один из бандитов подбирает его, быстро проверяет вес и довольно хмыкает."
-                    $ remove_all_gold()
-                    narrator "Главарь отступает с дороги, все еще улыбаясь."
-                    narrator "Ты проходишь мимо них, не оборачиваясь, хотя каждый шаг дается с трудом."
-                    jump act_1_rykard_before_mansion
-
-                "Отказаться отдать деньги":
-                    narrator "Ты не двигаешься."
-                    narrator "Улыбка главаря становится шире, но в глазах не остается ни капли веселья."
-                    narrator "Он чуть склоняет голову, и этого оказывается достаточно."
-                    narrator "Двое за твоей спиной одновременно берутся за ножи."
-                    jump act_1_rykard_gang_counter_guard_save
-
         if agatha_arrested_flag:
             narrator "Главарь прищуривается, вглядываясь в твое лицо."
             narrator "Сначала в его взгляде мелькает сомнение, через несколько секунд перерастающее в уверенность."
@@ -896,7 +963,35 @@ label act_1_rykard_gang_counter:
             narrator "До тебя доходит слишком поздно: новость о ее поимке уже разошлась по тем улицам, где Ордену не рады."
             narrator "Главарь больше не просит денег."
             narrator "Теперь ему нужно совсем другое."
+
             jump act_1_rykard_gang_counter_guard_save
+
+        narrator "Главарь останавливается прямо перед тобой и улыбается так, словно вы старые знакомые."
+        narrator "От него пахнет дешевым элем, мокрой кожей и холодным железом."
+        narrator "Он говорит негромко, почти дружелюбно, но двое за твоей спиной уже стоят слишком близко."
+        narrator "В такие часы на улицах Морвейна никто не задает лишних вопросов. Никто не выглядывает из окон. Никто не спешит на помощь."
+        narrator "Главарь кивает на твой кошель."
+        narrator "Цена прохода оказывается простой: все, что у тебя есть."
+
+        menu:
+            "Отдать все деньги":
+                narrator "Ты медленно достаешь кошель и бросаешь его на мокрую мостовую."
+                narrator "Один из бандитов подбирает его, быстро проверяет вес и довольно хмыкает."
+
+                $ remove_all_gold()
+                
+                narrator "Главарь отступает с дороги, все еще улыбаясь."
+                narrator "Ты проходишь мимо них, не оборачиваясь, хотя каждый шаг дается с трудом."
+
+                jump act_1_rykard_before_mansion
+
+            "Отказаться отдать деньги":
+                narrator "Ты не двигаешься."
+                narrator "Улыбка главаря становится шире, но в глазах не остается ни капли веселья."
+                narrator "Он чуть склоняет голову, и этого оказывается достаточно."
+                narrator "Двое за твоей спиной одновременно берутся за ножи."
+
+                jump act_1_rykard_gang_counter_guard_save
 
     jump act_1_rykard_before_mansion
 
@@ -912,7 +1007,9 @@ label act_1_rykard_gang_counter_guard_save:
     narrator "Троица отступает почти сразу, растворяясь в темноте быстрее, чем появилась."
     narrator "Страж Рикарда опускает оружие и коротко смотрит на тебя."
     narrator "Похоже, к особняку тебя решили проводить лично."
+
     $ hero_saved_by_guard = True
+
     jump act_1_rykard_before_mansion
 
 label act_1_rykard_before_mansion:

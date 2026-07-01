@@ -275,3 +275,17 @@ label show_act_title(act_title, act_subtitle=None, display_time=3.8):
     hide screen gui
     call screen act_title_screen(act_title, act_subtitle, display_time)
     return
+
+screen soft_vignette(fade_time=3.0):
+    zorder 100
+    add "images/effects/vignette_soft_1920x1080.png" at vignette_fade_in(fade_time)
+
+transform vignette_fade_in(fade_time=3.0):
+    alpha 0.0
+    linear fade_time alpha 1.0
+
+transform vignette_fade_out(fade_time=3.0):
+    alpha 1.0
+    linear fade_time alpha 0.0
+
+
