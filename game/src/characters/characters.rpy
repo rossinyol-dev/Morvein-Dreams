@@ -51,13 +51,9 @@ define agatha = Character('Агата', color="#eb049a")
 define rykard = Character('Рикард фон Триллиан', color="#002b7c")
 define innkeeper = Character('Трактирщик Виллем', color="#084f0c")
 define albert = Character('Альберт', color="#9b6a2f")
-define rykard_armed_guard = Character('Незнакомец', color="#6f3b3b")
+define rykard_guard_armed = Character('Страж Рикарда', color="#6f3b3b")
 define rykard_guard_unarmed = Character('Незнакомец', color="#6f3b3b")
 define gang_leader = Character('Главарь', color="#7a7a7a")
 define willem = Character('Виллем', color="#116554")
 define gang_leader = Character('Главарь банды', color="#116554")
-define minstrel_default = Character('Главарь банды', color="#d7bc0e")
-
-
-
-
+define minstrel_default = Character('Менестрель', color="#d7bc0e")

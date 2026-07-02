@@ -280,6 +280,45 @@ screen soft_vignette(fade_time=3.0):
     zorder 100
     add "images/effects/vignette_soft_1920x1080.png" at vignette_fade_in(fade_time)
 
+screen cinematic_dialogue(text, show_time=4.0, fade_out_time=0.8, centered=False, italic=False):
+    zorder 200
+    modal True
+
+    $ display_text = "{i}" + text + "{/i}" if italic else text
+
+    key "dismiss" action NullAction()
+    key "rollback" action NullAction()
+    key "skip" action NullAction()
+    key "toggle_skip" action NullAction()
+
+    window:
+        style "window"
+        at cinematic_dialogue_fade_in_out(show_time, fade_out_time)
+
+        if centered:
+            text display_text:
+                style "say_dialogue"
+                xalign 0.5
+                text_align 0.5
+        else:
+            text display_text:
+                style "say_dialogue"
+
+    timer show_time action Return()
+
+label cinematic_narrator(text, show_time=4.0, hide_time=2.0, centered=False, italic=False):
+    $ fade_out_time = min(0.8, show_time)
+    call screen cinematic_dialogue(text, show_time, fade_out_time, centered, italic)
+    $ renpy.pause(hide_time, hard=True)
+    return
+
+transform cinematic_dialogue_fade_in_out(show_time=4.0, fade_out_time=0.8):
+    alpha 0.0
+    yoffset 24
+    ease 0.8 alpha 1.0 yoffset 0
+    pause max(0.0, show_time - 0.8 - fade_out_time)
+    ease fade_out_time alpha 0.0 yoffset 24
+
 transform vignette_fade_in(fade_time=3.0):
     alpha 0.0
     linear fade_time alpha 1.0
