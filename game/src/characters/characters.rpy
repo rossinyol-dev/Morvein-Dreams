@@ -41,6 +41,14 @@ define horror = Character(
     what_color="#f61111",
     what_slow_cps=15
 )
+define aspect = Character(
+    None,
+    what_font="fonts/dream.ttf",
+    what_xalign=0.5,
+    what_text_align=0.5,
+    what_color="#0619c5",
+    what_slow_cps=15
+)
 define beggar = Character('Нищий', color="#7c9703")
 define stefan = Character('Отец Стефан', color="#b02d2d")
 define cultist = Character('Культист', color="#6a4001")

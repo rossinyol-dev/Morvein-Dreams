@@ -38,6 +38,14 @@ define aspect_colors = [
     "#e600ff",
 ]
 
+define aspect_threshold_texts = {
+    4: "Люди вокруг начинают казаться тебе странными, словно они не совсем из этого мира...",
+    6: "Мир начинает утрачивать привычные очертания, словно что-то проникает в ткань реальности...",
+    8: "Он уже рядом...",
+}
+
+default shown_aspect_thresholds = []
+
 define mercy_colors = [
     "#654320",
     "#884c19",
@@ -117,6 +125,7 @@ init python:
 
 
     def add_aspect(hero, value=1):
+        old_aspect = hero.aspect
         old_penalty = aspect_penalty(hero)
 
         add_stat(hero, "aspect", value)
@@ -127,6 +136,17 @@ init python:
         if penalty > 0:
             reduce_stat(hero, "reason", penalty)
             reduce_stat(hero, "control", penalty)
+
+        show_aspect_threshold_screen(old_aspect, hero.aspect)
+
+    def show_aspect_threshold_screen(old_aspect, new_aspect):
+        for threshold in (4, 6, 8):
+            if old_aspect < threshold and new_aspect >= threshold and threshold not in shown_aspect_thresholds:
+                shown_aspect_thresholds.append(threshold)
+                renpy.call_in_new_context(
+                    "aspect_threshold_scene",
+                    aspect_threshold_texts[threshold]
+                )
 
     def reduce_aspect(hero, value=1):
         old_penalty = aspect_penalty(hero)

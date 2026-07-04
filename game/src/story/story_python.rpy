@@ -54,9 +54,17 @@ init python:
         renpy.show("black", layer="background")
         renpy.layer_at_list([slow_shaking], layer="master")
 
+    def start_dream_effect_without_music():
+        renpy.sound.play("audio/fx/horror_bell.mp3")
+        renpy.show("black", layer="background")
+        renpy.layer_at_list([slow_shaking], layer="master")
+
     def stop_dream_effect():
         renpy.music.stop(fadeout=2.0)
         resume_music()
+        renpy.layer_at_list([], layer="master")
+
+    def stop_dream_effect_without_music():
         renpy.layer_at_list([], layer="master")
 
     def hard_fade(scene_name, delay=3.0, texts = None, show_gui=True, dream=True):

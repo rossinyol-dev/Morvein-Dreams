@@ -72,3 +72,26 @@ screen blood_overlay(hero_instance):
     elif hero_instance.state == STATE.GRAVELY:
         add "images/misc/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
         timer 20.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
+
+label aspect_threshold_scene(message):
+    hide screen gui
+    with fade
+
+    $ renpy.show("black", zorder=-100)
+
+    $ start_dream_effect_without_music()
+
+    $ old_skip = preferences.skip_unseen
+    $ preferences.skip_unseen = False
+
+    aspect "[message]"
+    $ renpy.pause(2.0, hard=True)
+
+    show screen gui(hero)
+    with fade
+
+    $ stop_dream_effect_without_music()
+
+    $ preferences.skip_unseen = old_skip
+
+    return
