@@ -242,11 +242,15 @@ label act_1_investigation_well_alley:
         narrator "Ощупав голову, ты чувствуешь, что пальцы мгновенно становятся липкими от крови."
         narrator "Надо срочно что-то предпринять..."
 
+        window hide
+
         $ hero.state = STATE.GRAVELY
 
         $ renpy.pause(20.0, modal=True, hard=True)
 
         if hero.state == STATE.HEALTHY:
+            window show
+
             narrator "Ты выливаешь на открытую рану целебный отвар, заставив жгучую боль на время отступить."
             narrator "Но долго так не протянуть, надо как-то выбираться..."
             narrator "Стоит тебе только подумать об этом, как сверху к твоим ногам падает толстая верёвка."
