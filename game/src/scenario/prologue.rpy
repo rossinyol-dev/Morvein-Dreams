@@ -291,14 +291,14 @@ label morvein_from_temple:
         narrator "Через секунду его силы иссякают, и он замертво валится на брусчатку."
 
         $ hide_dream_char("beggar standing")
-        $ hard_fade("morvein_from_temple", 3.0)
+        $ hard_fade("morvein_from_temple", delay=1.0, show_gui=False)
 
         narrator "Какое-то время ты просто неподвижно стоишь, пытаясь перевести дух и унять дрожь в руках."
         narrator "У твоих ног неподвижно лежит отец Стефан. Из глубокой раны на его виске струится кровь — настоятель дышит, но дышит тяжело и редко."
 
         menu:
             "Спасти отца Стефана":
-                $ hard_fade("temple_outside")
+                $ hard_fade("temple_outside", show_gui=False)
                 $ stefan_saved_flag = True
 
                 "С трудом взвалив грузное тело священника на плечи, ты ковыляешь обратно к собору."

@@ -3,7 +3,7 @@ screen main_menu():
     tag menu
 
     # Добавление вашей картинки на фон
-    add "images/bg/main_menu.png" xsize 1920 ysize 1080
+    add "images/bg/.main_menu.png" xsize 1920 ysize 1080
 
     vbox:
         xpos 0.06

@@ -4,7 +4,7 @@ label act_1_hospital_before_start:
 
     play music "hospital.mp3" fadein 5.0
 
-    $ hard_fade("temple_bed_view", 5.0, show_gui=False)
+    $ hard_fade("temple_bed_view", 5.0, show_gui=False, dream=True)
 
     $ hero.state = STATE.HEALTHY
 
@@ -142,7 +142,7 @@ label act_1_start:
 ######################################
 
 label act_1_investigation_streets:
-    $ change_music("audio/morvein_explore.mp3")
+    $ change_music("audio/morvein_explore.mp3", fadeout=0.0)
     $ hard_fade("morvein_streets")
 
     narrator "Через несколько минут ты снова оказываешься на знакомой улице."
@@ -231,9 +231,10 @@ label act_1_investigation_well_alley:
             "Все ответы ждут внизу..."
         ],
         [],
-        True)
+        False)
 
-        $ hard_fade("morvein_well_from_inside")
+        $ change_music("<from 85.0>audio/tombs_theme.m4a", fadeout=3.0, fadein=1.0)    
+        $ hard_fade("morvein_well_from_inside", show_gui=True)
 
         $ add_aspect(hero)
 
@@ -252,6 +253,7 @@ label act_1_investigation_well_alley:
             narrator "Высоко над собой ты видишь смутный силуэт паренька, который изо всех сил удерживает ее."
             narrator "Ухватившись за веревку обеими руками, ты начинаешь карабкаться вверх."
 
+        $ change_music("audio/morvein_explore.mp3")
         $ hard_fade("morvein_well_alley")
 
         narrator "Поднявшись на поверхность, ты садишься на землю, привалившись спиной к каменной кладке."

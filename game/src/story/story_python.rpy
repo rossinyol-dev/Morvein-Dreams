@@ -59,7 +59,7 @@ init python:
         resume_music()
         renpy.layer_at_list([], layer="master")
 
-    def hard_fade(scene_name, delay=3.0, texts = None, show_gui=True):
+    def hard_fade(scene_name, delay=3.0, texts = None, show_gui=True, dream=True):
         renpy.stop_skipping()
 
         renpy.hide_screen("say")
@@ -78,7 +78,15 @@ init python:
 
         renpy.pause(0.5, hard=True)
 
-        renpy.show(scene_name, layer="master", at_list=[fade_in_from_black(delay)])
+        if dream:
+            renpy.show(
+                scene_name,
+                what=DynamicDisplayable(dream_scene_dynamic, scene_name),
+                layer="master",
+                at_list=[fade_in_from_black(delay)]
+            )
+        else:
+            renpy.show(scene_name, layer="master", at_list=[fade_in_from_black(delay)])
         renpy.pause(delay, hard=True)
 
         if show_gui:
@@ -87,8 +95,18 @@ init python:
     def dream_scene_dynamic(st, at, image_name):
         global dream_alpha
 
-        dream_alpha += random.uniform(-0.05, 0.05)
-        dream_alpha = max(0.4, min(0.6, dream_alpha))
+        if globals().get("hero_selected", False):
+            dream_alpha = max(0.0, min(1.0, (hero.aspect - 5) * 0.25))
+        else:
+            dream_alpha = 0.0
+
+        if dream_alpha <= 0.0:
+            return renpy.displayable(image_name), 0.1
+
+        base = renpy.displayable(image_name)
+        purple_alpha = dream_alpha * 0.55
+        red_alpha = dream_alpha * 0.25
+        amber_alpha = dream_alpha * 0.12
 
         d = Composite(
             (1920, 1080),
@@ -98,7 +116,6 @@ init python:
                 alpha=dream_alpha
             )
         )
-
         return d, 0.1
 
         fade_to_black()

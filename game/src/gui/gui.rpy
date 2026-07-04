@@ -76,7 +76,7 @@ screen inventory_button():
             add Transform(
                 "images/misc/inventory.png",
                 zoom=0.22,
-                matrixcolor=TintMatrix("#ff4800")
+                matrixcolor=TintMatrix("#00ff08")
             ) at inventory_wound_blink:
                 align (0.5, 0.5)
         else:
