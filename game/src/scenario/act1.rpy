@@ -143,6 +143,7 @@ label act_1_start:
 
 label act_1_investigation_streets:
     $ change_music("audio/morvein_explore.mp3", fadeout=0.0)
+    call tutorial_text
     $ hard_fade("morvein_streets")
 
     narrator "Через несколько минут ты снова оказываешься на знакомой улице."

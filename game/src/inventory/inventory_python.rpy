@@ -105,7 +105,9 @@ init python:
 
     def use_potion_energy(item):
         if item.count > 0:
+            renpy.store.inventory_tutorial_blink = False
             reduce_aspect(hero)
+            renpy.call_in_new_context("potion_energy_relief")
 
     def use_potion_dream(item):
         if item.count > 0:

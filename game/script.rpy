@@ -1,5 +1,7 @@
 ﻿# Флаги истории
 default hero_selected = False
+default tutorial_shown_flag = False
+default inventory_tutorial_blink = False
 
 # Флаги квестов
 default beggar_flag_help = False

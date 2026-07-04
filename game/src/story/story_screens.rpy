@@ -196,27 +196,24 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts
 
     return
 
-screen tutorial_text(message):
-    zorder 1000
-    modal False
+label tutorial_text:
+    if tutorial_shown_flag:
+        return
 
-    frame:
-        xalign 0.5
-        yalign 0.82
-        xmaximum 1200
-        yminimum 150
+    scene black with fade
+    show screen gui(hero)
 
-        background Solid("#000000CC")
-        padding (35, 28)
+    narrator "Добро пожаловать в Сны Морвейна!"
+    narrator "Это нарративная игра с элементами визуальной новеллы и RPG в позднесредневековом стиле."
+    narrator "В ней вам предстоит погрузиться в мир, где каждый выбор имеет подследствия, а ваши действия формируют судьбу героя и целого города."
+    narrator "В правом верхнем углу находится иконка персонажа. Нажав на нее, вы увидите описание героя и его состояние."
+    narrator "В инвентаре вы найдете предметы, которые помогут вам в путешествии. Некоторые из них можно использовать, а некоторые — изучить."
+    narrator "Не ждите от игры привычных подсказок — здесь многое решает ваша внимательность и способность анализировать происходящее."
+    narrator "Да пребудет с вами Сила!"
 
-        text message:
-            xalign 0.5
-            yalign 0.5
-            text_align 0.5
-            font "fonts/char.ttf"
-            size 34
-            color "#e6d2aa"
-            outlines [(2, "#000000", 0, 0)]
+    $ tutorial_shown_flag = True
+
+    return
 
 transform act_title_fade:
     alpha 0.0

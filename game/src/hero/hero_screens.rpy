@@ -94,4 +94,15 @@ label aspect_threshold_scene(message):
 
     $ preferences.skip_unseen = old_skip
 
+    $ potion_energy = get_inventory_item("potion_energy")
+    if potion_energy and potion_energy.count > 0:
+        narrator "Зелье бодрости звенит в сумке."
+        narrator "Сейчас было бы разумно выпить его."
+        $ inventory_tutorial_blink = True
+
+    return
+
+label potion_energy_relief:
+    narrator "Ты чувствуешь облегчение."
+
     return
