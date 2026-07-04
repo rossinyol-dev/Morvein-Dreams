@@ -10,6 +10,7 @@ image morvein_streets_mix = DynamicDisplayable(
 )
 
 image morvein_well_alley = im.Scale("bg/morvein_well_alley.png", 1920, 1080)
+image morvein_night_alley = im.Scale("bg/morvein_night_alley.png", 1920, 1080)
 image morvein_tavern = im.Scale("bg/morvein_tavern.png", 1920, 1080)
 image morvein_merchant_shop = im.Scale("bg/morvein_merchant_shop.png", 1920, 1080)
 image morvein_well_view = im.Scale("bg/morvein_well_view.png", 1920, 1080)

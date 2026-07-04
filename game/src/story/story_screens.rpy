@@ -147,11 +147,6 @@ label to_be_continued:
     # Обязательно добавляем паузу, иначе игра сразу закроется!
     # Игрок увидит картинку с текстом и сможет нажать клик для выхода.
     $ renpy.pause()
-
-    $ renpy.take_screenshot()
-    $ renpy.save("1-2", "Начало 2 акта")
-
-    call show_act_title("АКТ II", "ЗОВ")
     
     return
 
@@ -279,6 +274,21 @@ label show_act_title(act_title, act_subtitle=None, display_time=3.8):
 screen soft_vignette(fade_time=3.0):
     zorder 100
     add "images/effects/vignette_soft_1920x1080.png" at vignette_fade_in(fade_time)
+
+screen soft_vignette_hide(fade_time=3.0):
+    zorder 100
+    add "images/effects/vignette_soft_1920x1080.png" at vignette_fade_out(fade_time)
+
+label show_vignette(fade_time=3.0):
+    show screen soft_vignette(fade_time)
+    return
+
+label hide_vignette(fade_time=3.0):
+    hide screen soft_vignette
+    show screen soft_vignette_hide(fade_time)
+    $ renpy.pause(fade_time, hard=True)
+    hide screen soft_vignette_hide
+    return
 
 screen cinematic_dialogue(text, show_time=4.0, fade_out_time=0.8, centered=False, italic=False):
     zorder 200
