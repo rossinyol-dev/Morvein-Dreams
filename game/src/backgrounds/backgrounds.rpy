@@ -8,7 +8,6 @@ image morvein_streets_mix = DynamicDisplayable(
     dream_scene_dynamic,
     "morvein_streets"
 )
-
 image morvein_well_alley = im.Scale("bg/morvein_well_alley.png", 1920, 1080)
 image morvein_night_alley = im.Scale("bg/morvein_night_alley.png", 1920, 1080)
 image morvein_tavern = im.Scale("bg/morvein_tavern.png", 1920, 1080)
