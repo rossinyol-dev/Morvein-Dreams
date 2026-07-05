@@ -2,7 +2,7 @@
 label act_1_hospital_before_start:
     play music "hospital.mp3" fadein 5.0
 
-    $ hard_fade("temple_bed_view", 5.0, show_gui=False, dream=True)
+    $ hard_fade("temple_bed_view", 5.0, show_gui=False)
 
     $ hero.state = STATE.HEALTHY
 
@@ -41,6 +41,8 @@ label act_1_hospital_before_start:
 
     $ hide_dream_char("mattias default")
 
+    $ fade_to_black(3.0, 2.0)
+
     call dream_scene(
     [
         "Ты слышишь колокола и шум прибоя...",
@@ -57,6 +59,8 @@ label act_1_hospital_before_start:
     False)
     
     $ add_aspect(hero)
+
+    $ hard_fade("temple_bed_view", 5.0, show_gui=False)
 
     $ dream_char("mattias default", [center])
 
@@ -177,7 +181,7 @@ label act_1_investigation_well_alley:
     $ dream_char("rykard guard unarmed", [center])
 
     narrator "На заднем дворе таверны ты сразу замечаешь фигуру в плаще, неподвижно стоящую у старого колодца."
-    narrator "Его камни покрыты старым мхом, а железная цепь давно почернела от ржавчины."
+    narrator "Камни колодца покрыты старым мхом, а железная цепь давно почернела от ржавчины."
     narrator "Незнакомец молча указывает рукой вниз, словно призывая тебя заглянуть внутрь. Ты подходишь ближе."
 
     $ hard_fade("morvein_well_view")
@@ -345,7 +349,7 @@ label act_1_investigation_tavern_song:
     call cinematic_narrator("Когда её нежный голос разносится по залу, наступает полная тишина. Все взгляды устремляются к поющей девушке.", 7.0, 1.5)
     call cinematic_narrator("{i}О, расскажи мне перед сном{/i}\n{i}О дальних островах{/i}", 7.5, 1.0, centered=True)
     call cinematic_narrator("{i}Там, за туманами, наш дом{/i}\n{i}Сокрыт в плавучих льдах.{/i}", 7.5, 1.0, centered=True)
-    call cinematic_narrator("{i}По горным пикам ходит тихо{/i}\n{i}С тросточкой борей.{/i}", 7.5, 1.0, centered=True)
+    call cinematic_narrator("{i}По горным пикам ходит тихо{/i}\n{i}Призрачный борей.{/i}", 7.5, 1.0, centered=True)
     call cinematic_narrator("{i}И плачет над курганами{/i}\n{i}Тонкая свирель.{/i}", 7.5, 1.0, centered=True)
     $ renpy.pause(2.0, hard=True)
     call cinematic_narrator("Пение Эйлин на краткий миг уносит тебя прочь от тревог. Мир вокруг постепенно теряет очертания.", 7., 1.5)
@@ -457,6 +461,7 @@ label act_1_investigation_tavern_meeting:
     narrator "Он кладет приглашение на стойку прямо перед тобой."
     narrator "После этого незнакомец коротко кивает вам обоим, разворачивается и молча покидает таверну."
 
+    $ hard_fade("morvein_tavern", delay = 2.0)
     $ hide_dream_char("rykard guard unarmed")
     $ dream_char("willem default", [center])
 
@@ -995,8 +1000,11 @@ label act_1_rykard_gang_counter:
     jump act_1_rykard_before_mansion
 
 label act_1_rykard_gang_counter_guard_save:
+    $ hard_fade("morvein_night_alley", delay = 1.0)
+
     narrator "Первый удар приходит сбоку."
     narrator "Ты успеваешь отшатнуться, но второй бандит оказывается рядом, замахивась кинжалом."
+    narrator "Кожа покрывается мурашками от осознания безвыходности ситуации..."
 
     $ hide_dream_char("gang leader default")
     $ dream_char("rykard guard armed", [center])

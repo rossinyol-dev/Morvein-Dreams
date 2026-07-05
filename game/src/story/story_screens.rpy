@@ -216,11 +216,11 @@ label tutorial_text:
 
     return
 
-transform act_title_fade:
+transform act_title_fade(display_time=3.8):
     alpha 0.0
     yoffset 18
     ease 1.4 alpha 1.0 yoffset 0
-    pause 1.4
+    pause max(0.0, display_time - 2.4)
     ease 1.0 alpha 0.0 yoffset -12
 
 screen act_title_screen(act_title, act_subtitle=None, display_time=3.8):
@@ -229,13 +229,13 @@ screen act_title_screen(act_title, act_subtitle=None, display_time=3.8):
 
     add Solid("#000000")
 
-    button:
-        xfill True
-        yfill True
-        background None
-        action Return()
+    key "dismiss" action NullAction()
+    key "rollback" action NullAction()
+    key "skip" action NullAction()
+    key "toggle_skip" action NullAction()
+    key "game_menu" action NullAction()
 
-    vbox at act_title_fade:
+    vbox at act_title_fade(display_time):
         xalign 0.5
         yalign 0.48
         spacing 28

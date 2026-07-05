@@ -230,8 +230,21 @@ init python:
         total_pause = fade_time + pause_time
         renpy.pause(total_pause, hard=True)
 
+    def audio_duration(track, fallback=3.8):
+        try:
+            duration = renpy.music.get_duration(track)
+            if duration:
+                return duration
+        except Exception:
+            pass
+
+        return fallback
+
     def start_act(title, subtitle, act_num, scene):
-        renpy.play("audio/act_start.mp3", "music")
+        act_start_track = "audio/act_start.mp3"
+        act_start_duration = audio_duration(act_start_track)
+
+        renpy.music.play(act_start_track, channel="music", loop=False)
 
         renpy.hide_screen("gui")
         renpy.hide_screen("say")
@@ -246,6 +259,6 @@ init python:
 
         renpy.take_screenshot()
         renpy.save("1-[act_num]", "Начало [act_num] акта")
-        renpy.call("show_act_title", title, subtitle)
+        renpy.call("show_act_title", title, subtitle, act_start_duration)
 
         return scene

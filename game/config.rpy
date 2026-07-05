@@ -1,4 +1,4 @@
-define debug = False
+define debug = True
 define config.menu_include_disabled = debug
 define config.rollback_enabled = debug
 define config.default_afm_enable = debug
