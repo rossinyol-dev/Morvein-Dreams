@@ -85,6 +85,7 @@ label aspect_threshold_scene(message):
     $ preferences.skip_unseen = False
 
     aspect "[message]"
+    aspect "Ты чувствешь слабость..."
     $ renpy.pause(2.0, hard=True)
 
     show screen gui(hero)

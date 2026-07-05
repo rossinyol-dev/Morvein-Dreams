@@ -106,6 +106,8 @@ init python:
     def use_potion_energy(item):
         if item.count > 0:
             renpy.store.inventory_tutorial_blink = False
+            renpy.hide_screen("inventory_overlay")
+            renpy.hide_screen("item_description")
             reduce_aspect(hero)
             renpy.call_in_new_context("potion_energy_relief")
 

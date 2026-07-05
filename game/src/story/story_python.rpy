@@ -132,7 +132,7 @@ init python:
         if pos is None:
             pos = []
 
-        low_dream_level=3
+        low_dream_level=4
 
         if hero.aspect >= low_dream_level:
             renpy.show(

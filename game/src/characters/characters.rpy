@@ -19,6 +19,7 @@ image albert default = Transform("images/chars/albert_default.png", zoom=0.7)
 image willem default = Transform("images/chars/willem_default.png", zoom=0.7)
 image gang leader default = Transform("images/chars/gang_leader_default.png", zoom=0.7)
 image mistrel default = Transform("images/chars/minstrel_default.png", zoom=0.7)
+image mistrel horror = Transform("images/chars/minstrel_horror.png", zoom=0.7)
 
 # Персонажи
 define narrator = Character()

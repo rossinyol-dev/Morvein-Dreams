@@ -1,7 +1,5 @@
 ﻿# Первый акт
 label act_1_hospital_before_start:
-    call show_act_title("АКТ I", "ТАЙНА")
-
     play music "hospital.mp3" fadein 5.0
 
     $ hard_fade("temple_bed_view", 5.0, show_gui=False, dream=True)
@@ -41,7 +39,7 @@ label act_1_hospital_before_start:
     mattias "Возможно, они могут даже подозревать тебя в чем-то..." 
     mattias "Впрочем, хватит об этом! Сейчас тебе нужен отдых — продолжим наш разговор позднее."
 
-    hide mattias default with dissolve
+    $ hide_dream_char("mattias default")
 
     call dream_scene(
     [
@@ -57,9 +55,9 @@ label act_1_hospital_before_start:
     ],
     [],
     False)
-
-    $ add_aspect(hero)
     
+    $ add_aspect(hero)
+
     $ dream_char("mattias default", [center])
 
     narrator "Брат Маттиас встревоженно подбегает к тебе."
@@ -86,7 +84,7 @@ label act_1_hospital_before_start:
     narrator "Маттиас, заметив это, беззвучно отступает от кровати и выходит за дверь."
     narrator "Последнее, что ты слышишь перед погружением в сон, это звук удаляющихся шагов..."
 
-    hide mattias default with dissolve
+    $ hide_dream_char("mattias default")
 
     $ hard_fade("temple_bed_view", show_gui=False)
     
@@ -114,18 +112,18 @@ label act_1_start:
     if hero.prof == PROF.MONK:
         $ inventory_items = [
             InvItem("coins", "Золото", "images/misc/coins.png", "Золотая марка Морвейна. Причина людского раздора во все времена.", 100),
-            InvItem("potion_hp", "Зелье исцеления", "images/misc/potion.png", "Колба с мерцающей красной жидкостью внутри. Исцеляет даже самые тяжелые раны.", 10),
-            InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_energy.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 10),
-            InvItem("potion_poison", "Яд", "images/misc/potion_poison.png", "Яд", 10),
-            InvItem("potion_dream", "Зелье сна", "images/misc/potion_dream.png", "Зелье сна", 10),
+            InvItem("potion_hp", "Зелье исцеления", "images/misc/potion.png", "Колба с мерцающей красной жидкостью внутри. Исцеляет даже самые тяжелые раны.", 1),
+            InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_energy.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 2),
+            # InvItem("potion_poison", "Яд", "images/misc/potion_poison.png", "Яд", 10),
+            # InvItem("potion_dream", "Зелье сна", "images/misc/potion_dream.png", "Зелье сна", 10),
         ]
     else:
         $ inventory_items = [
             InvItem("coins", "Золото", "images/misc/coins.png", "Золотая марка Морвейна. Причина людского раздора во все времена.", 300),
-            InvItem("potion_hp", "Зелье исцеления", "images/misc/potion.png", "Колба с мерцающей красной жидкостью внутри. Исцеляет даже самые тяжелые раны.", 10),
-            InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_energy.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 10),
-            InvItem("potion_poison", "Яд", "images/misc/potion_poison.png", "Яд", 10),
-            InvItem("potion_dream", "Зелье сна", "images/misc/potion_dream.png", "Зелье сна", 10),
+            InvItem("potion_hp", "Зелье исцеления", "images/misc/potion.png", "Колба с мерцающей красной жидкостью внутри. Исцеляет даже самые тяжелые раны.", 2),
+            InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_energy.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 1),
+            # InvItem("potion_poison", "Яд", "images/misc/potion_poison.png", "Яд", 10),
+            # InvItem("potion_dream", "Зелье сна", "images/misc/potion_dream.png", "Зелье сна", 10),
         ]
 
     menu:
@@ -202,9 +200,7 @@ label act_1_investigation_well_alley:
             [],
             False)
 
-    $ add_aspect(hero)
-
-    if hero.control >= 6:
+    if hero.control >= 8:
         narrator "В последний момент ты приходишь в себя и с ужасом понимаешь: еще секунда — и ты рухнул бы в колодец головой вниз."
 
         $ hard_fade("morvein_well_alley")
@@ -213,14 +209,20 @@ label act_1_investigation_well_alley:
         narrator "Незнакомца нигде не видно..."
         narrator "Ты поднимаешь глаза и замечаешь перед собой молодого паренька в грязной рубашке. Он глядит на тебя с испугом."
 
+
         $ dream_char("albert default", [center])
 
         albert "Господин, меня послал за вами мастер Виллем. Я Альберт — его помощник."
+
+        $ add_aspect(hero)
+
         albert "Мастер сразу почуял неладное, когда вы молча ушли со стеклянным взглядом, даже не расплатившись."
         albert "Вы скверно выглядите, пойдемте обратно. Хозяин о вас позаботится."
 
         jump act_1_investigation_after_well
     else:
+        $ fade_to_black(fade_time=1.0, pause_time=1.0)
+
         call dream_scene(
         [
             "К шепоту мальчика присоединяется голос девочки..."
@@ -236,8 +238,6 @@ label act_1_investigation_well_alley:
 
         $ change_music("<from 85.0>audio/tombs_theme.m4a", fadeout=3.0, fadein=1.0)    
         $ hard_fade("morvein_well_from_inside", show_gui=True)
-
-        $ add_aspect(hero)
 
         narrator "Ты приходишь в себя на дне колодца от вспышки острой боли."
         narrator "Ощупав голову, ты чувствуешь, что пальцы мгновенно становятся липкими от крови."
@@ -266,6 +266,8 @@ label act_1_investigation_well_alley:
         narrator "Перед тобой стоит молодой паренек в грязной рубашке, глядя с испугом."
 
         $ dream_char("albert default", [center])
+
+        $ add_aspect(hero, value = 1.5)
 
         albert "Господин, меня послал за вами мастер Виллем. Я Альберт — его помощник."
         albert "Он сразу почуял неладное, когда вы молча ушли со стеклянным взглядом, даже не расплатившись."
@@ -315,7 +317,7 @@ label act_1_investigation_after_well:
             narrator "Ты видишь, как мастер Виллем незаметно смахивает слезу с глаза."
             willem "Все, мне надо работать. Альберт, за мной!"
 
-    hide willem default with dissolve
+    $ hide_dream_char("willem default")
 
     jump act_1_investigation_tavern_song
 
@@ -323,7 +325,7 @@ label act_1_investigation_tavern_song:
     $ hard_fade("morvein_tavern", delay=6.0,show_gui=False)
 
     narrator "Пару часов ты дремлешь в зале, облокотившись на спинку стула и укрывшись принесенным хозяином пледом."
-    narrator "Когда ты просыпаешься, то таверна уже практически полностью заполнена людьми в ожидании выступления."
+    narrator "Когда ты просыпаешься, то таверна уже практически полностью заполнена людьми, ожидающими выступления."
     narrator "Посетители громко спорят и стучат кружками по столам."
     
     $ dream_char("mistrel default", [center])
@@ -354,9 +356,33 @@ label act_1_investigation_tavern_song:
 
     call hide_vignette(3.0)
 
-    narrator "Потом зал взрывается аплодисментами. Девушка улыбается, кланяется и исчезает так же тихо, как появилась."
+    if hero.control >= 8:
+        narrator "Потом зал взрывается аплодисментами. Девушка улыбается, кланяется и исчезает так же тихо, как появилась."
+    else:
+        $ hide_dream_char("mistrel default")
+
+        call dream_scene(
+            [],
+            "mistrel horror",
+            [
+                "Взгляд Эйлин пронзает тебя",
+                "Мой славный герой,\nПод старой горой",
+                "В подземной тиши\nДом мой ищи",
+            ],
+            [],
+            False)
+
+        $ hard_fade("morvein_tavern")
+
+        narrator "Ты чувствуешь, как сердце бешено бьется у тебя в груди после увиденного."
+        narrator "Кажется, это привиделось только тебе..."
+        narrator "Через пару секунд ты слышишь, как зал взрывается аплодисментами. Девушка улыбается, кланяется и исчезает так же тихо, как появилась."
 
     $ hide_dream_char("mistrel default")
+
+    $ add_aspect(hero, 0.5)
+
+    $ change_music("audio/morvein_explore.mp3")
 
     narrator "Ты замечаешь, как поспешно Виллем отворачивается от гостей, явно пытаясь сдержать слезы."
     narrator "Альберт рядом с ним сидит с открытым ртом, смотря на дверь, за которой скрылась Эйлин."
@@ -938,7 +964,7 @@ label act_1_rykard_gang_counter:
             narrator "Главарь останавливается прямо перед тобой и улыбается так, словно вы старые знакомые."
             narrator "От него разит дешевым элем и резким потом."
             gang_leader "Так-так-так, доктор, значит?"
-            gang_leader "Я не слишком-то дружу с эскулапами. Мой папаша, светлая ему память, отправился на тот свет по вине вашего брата."
+            gang_leader "Я не слишком-то дружу с врачевателями. Мой папаша, светлая ему память, отправился на тот свет по вине вашего брата."
             narrator "Но всякие обиды может сгладить добрый подарок порядочному человеку."
             narrator "Я думаю, пара сотен золотых будет в самый раз."
 
@@ -979,7 +1005,7 @@ label act_1_rykard_gang_counter_guard_save:
     narrator "Главарь отступает на шаг, но человек в темном плаще оказывается рядом раньше, чем тот успевает поднять свой меч."
     narrator "Короткий удар — и переулок снова погружается в тишину."
     narrator "Лишь теперь ты замечаешь на плаще незнакомца знак дома Триллианов."
-    rykard_guard_armed "Господин Рикард просил проследить, чтобы вы добрались живым."
+    rykard_guard_armed "Господин Рикард просил проследить, чтобы вы добрались в целости и сохранности."
     narrator "Страж Рикарда вытирает клинок о плащ одного из мертвецов и коротко кивает в сторону улицы."
     rykard_guard_armed "Идемте. Дальше я провожу вас сам."
 

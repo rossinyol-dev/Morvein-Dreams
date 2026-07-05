@@ -320,8 +320,5 @@ label morvein_from_temple:
     stop music fadeout 5.0
     $ fade_to_black(fade_time=3.0, pause_time=5.0, hide_screen="blood_overlay")
 
-    $ renpy.take_screenshot()
-    $ renpy.save("1-1", "Начало 1 акта")
-
     jump act_1_hospital_before_start
         
