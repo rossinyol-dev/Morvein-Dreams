@@ -1,5 +1,5 @@
 # Картинки фонов
-image morvein_start = im.Scale("bg/.start.png", 1920, 1080)
+image morvein_start = im.Scale("bg/_start.png", 1920, 1080)
 
 # Улицы
 image morvein_streets = im.Scale("bg/morvein_streets.png", 1920, 1080)

@@ -30,14 +30,6 @@ define control_desc = [
     "Твой разум остаётся непоколебим перед лицом ужаса.",
 ]
 
-define aspect_colors = [
-    "#44004b", 
-    "#790287", 
-    "#aa03bd",
-    "#ce00e5",
-    "#e600ff",
-]
-
 define aspect_threshold_texts = {
     4: "Люди вокруг начинают казаться тебе странными, словно они не совсем из этого мира...",
     6: "Мир начинает утрачивать привычные очертания, словно что-то проникает в ткань реальности...",
@@ -45,6 +37,14 @@ define aspect_threshold_texts = {
 }
 
 default shown_aspect_thresholds = []
+
+define aspect_colors = [
+    "#44004b", 
+    "#790287", 
+    "#aa03bd",
+    "#ce00e5",
+    "#e600ff",
+]
 
 define mercy_colors = [
     "#654320",
@@ -63,11 +63,11 @@ define reason_colors = [
 ]
 
 define control_colors = [
-    "#175009",
-    "#2a7615",
-    "#2aa21a",
-    "#42c811ff",
-    "#44ff00ff",
+    "#270202",
+    "#600909",
+    "#7a0b0b",
+    "#d10a0a",
+    "#ff0000",
 ]
 
 init python:
@@ -194,6 +194,16 @@ init python:
 
         return "{color=%s}%s{/color}" % (color_table[idx], text_table[idx])
 
+    def hero_state_color(state):
+        colors = {
+            STATE.HEALTHY: "#44ff00ff",
+            STATE.INJURED: "#d66a18",
+            STATE.GRAVELY: "#d10a0a",
+            STATE.DEAD: "#6f6f6f",
+        }
+
+        return colors.get(state, "#e6d2aa")
+
     def hero_state_desc(state):
         descriptions = {
             STATE.HEALTHY: "Ты полностью здоров.",
@@ -203,3 +213,6 @@ init python:
         }
 
         return descriptions.get(state, getattr(state, "value", str(state)))
+
+    def hero_state_colored_desc(state):
+        return "{color=%s}%s{/color}" % (hero_state_color(state), hero_state_desc(state))

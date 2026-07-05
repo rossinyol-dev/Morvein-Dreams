@@ -22,7 +22,7 @@ default finished_act = False
 
 # Точка входа
 label start:
-    $ quick_menu = debug
+    $ quick_menu = debug and not renpy.variant("web")
     $ _skipping = debug
     $ _game_menu_screen = None
     $ preferences.afm_enable = not debug

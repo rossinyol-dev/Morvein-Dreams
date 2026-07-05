@@ -240,7 +240,7 @@ screen quick_menu():
     ## Гарантирует, что оно появляется поверх других экранов.
     zorder 100
 
-    if quick_menu:
+    if quick_menu and not renpy.variant("web"):
 
         hbox:
             style_prefix "quick"
@@ -1523,7 +1523,7 @@ screen quick_menu():
 
     zorder 100
 
-    if quick_menu:
+    if quick_menu and not renpy.variant("web"):
 
         hbox:
             style "quick_menu"

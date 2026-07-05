@@ -4,7 +4,7 @@ define config.rollback_enabled = debug
 define config.default_afm_enable = debug
 define config.gl_clear_color = "#000"
 define gui.main_menu_background = "#000"
-define quick_menu = debug
+define quick_menu = debug and not renpy.variant("web")
 default preferences.afm_enable = debug
 default preferences.afm_after_click = debug
 
