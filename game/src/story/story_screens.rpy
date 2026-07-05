@@ -69,7 +69,7 @@ screen char_choice():
                     text "Бывший монах Ордена. Служил в храме Морвейна много лет, прежде чем покинуть его. Годы служения сделали его черствым к людским слабостям, а увиденные странности стали проникать в его сновидения.":
                         xalign 0.0        # Описание начинается слева
                         text_align 0.0    # Выравнивание строк длинного текста по левому краю
-                        size 24           # Шрифт для описания чуть меньше
+                        size 30           # Шрифт для описания чуть меньше
                         color "#e0e0e0"
                         outlines [ (2, "#000", 0, 0) ]
 
@@ -100,7 +100,7 @@ screen char_choice():
                     text "Блестящий столичный лекарь. Попал в немилость из-за смерти влиятельного горожанина. Оказался в Морвейне совсем недавно, но уже заслужил уважение местных. Милосерден и крайне рационален, в происходящем в Морвейне пытается найти научное объяснение.":
                         xalign 0.0        # Описание начинается слева
                         text_align 0.0    # Выравнивание строк длинного текста по левому краю
-                        size 24
+                        size 30
                         color "#e0e0e0"
                         outlines [ (2, "#000", 0, 0) ]
 
@@ -131,21 +131,40 @@ label hero_died:
     
     return
 
+# Экран смерти
+label to_be_continued:
+    image tbc_message = Text("ПРОДОЛЖЕНИЕ СЛЕДУЕТ", style="death_style")
+
+    # Скрываем экран с кровью, так как персонаж уже мертв
+    hide screen gui
+
+    scene black with fade 
+
+    # Показываем текст ниже картинки (xalign 0.5 отцентрирует по горизонтали)
+    show expression "images/misc/hourglass.png" at Transform(xalign=0.5, yanchor=0.5, ypos=0.40)
+    show tbc_message at Transform(xalign=0.5, yanchor=0.5, ypos=0.80)
+    
+    # Обязательно добавляем паузу, иначе игра сразу закроется!
+    # Игрок увидит картинку с текстом и сможет нажать клик для выхода.
+    $ renpy.pause()
+    
+    return
+
 # Сцена сна
-label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts_end = [], show_gui_after = True, finish_nightmare = True):
+label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts_end = [], show_gui_after = True):
     hide screen gui
     with fade
 
     $ renpy.show("black", zorder=-100)
 
-    $ start_dream_effect(finish_nightmare)
+    $ start_dream_effect()
 
     $ old_skip = preferences.skip_unseen
     $ preferences.skip_unseen = False
 
     python:
         for text in texts_start:
-            horror(text)
+            dream(text)
             renpy.pause(2.0, hard=True)
 
     if texts_horror:
@@ -171,7 +190,148 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts
         show screen gui(hero)
         with fade
 
-    if finish_nightmare:
-        $ stop_dream_effect(finish_nightmare)
+    $ stop_dream_effect()
 
     $ preferences.skip_unseen = old_skip
+
+    return
+
+label tutorial_text:
+    if tutorial_shown_flag:
+        return
+
+    scene black with fade
+    show screen gui(hero)
+
+    narrator "Добро пожаловать в Сны Морвейна!"
+    narrator "Это нарративная игра с элементами визуальной новеллы и RPG в позднесредневековом стиле."
+    narrator "В ней вам предстоит погрузиться в мир, где каждый выбор имеет подследствия, а ваши действия формируют судьбу героя и целого города."
+    narrator "В правом верхнем углу находится иконка персонажа. Нажав на нее, вы увидите описание героя и его состояние."
+    narrator "В инвентаре вы найдете предметы, которые помогут вам в путешествии. Некоторые из них можно использовать, а некоторые — изучить."
+    narrator "Не ждите от игры привычных подсказок — здесь многое решает ваша внимательность и способность анализировать происходящее."
+    narrator "Да пребудет с вами Сила!"
+
+    $ tutorial_shown_flag = True
+
+    return
+
+transform act_title_fade:
+    alpha 0.0
+    yoffset 18
+    ease 1.4 alpha 1.0 yoffset 0
+    pause 1.4
+    ease 1.0 alpha 0.0 yoffset -12
+
+screen act_title_screen(act_title, act_subtitle=None, display_time=3.8):
+    zorder 1000
+    modal True
+
+    add Solid("#000000")
+
+    button:
+        xfill True
+        yfill True
+        background None
+        action Return()
+
+    vbox at act_title_fade:
+        xalign 0.5
+        yalign 0.48
+        spacing 28
+
+        text act_title:
+            xalign 0.5
+            text_align 0.5
+            font "fonts/char.ttf"
+            size 72
+            color "#d8c08a"
+            outlines [(2, "#000000", 0, 0)]
+
+        add Solid("#8b1f1f"):
+            xalign 0.5
+            xsize 420
+            ysize 2
+
+        if act_subtitle:
+            text act_subtitle:
+                xalign 0.5
+                text_align 0.5
+                font "fonts/char.ttf"
+                size 34
+                color "#d9d2c0"
+                outlines [(2, "#000000", 0, 0)]
+
+    timer display_time action Return()
+
+label show_act_title(act_title, act_subtitle=None, display_time=3.8):
+    hide screen gui
+    call screen act_title_screen(act_title, act_subtitle, display_time)
+    return
+
+screen soft_vignette(fade_time=3.0):
+    zorder 100
+    add "images/effects/vignette_soft_1920x1080.png" at vignette_fade_in(fade_time)
+
+screen soft_vignette_hide(fade_time=3.0):
+    zorder 100
+    add "images/effects/vignette_soft_1920x1080.png" at vignette_fade_out(fade_time)
+
+label show_vignette(fade_time=3.0):
+    show screen soft_vignette(fade_time)
+    return
+
+label hide_vignette(fade_time=3.0):
+    hide screen soft_vignette
+    show screen soft_vignette_hide(fade_time)
+    $ renpy.pause(fade_time, hard=True)
+    hide screen soft_vignette_hide
+    return
+
+screen cinematic_dialogue(text, show_time=4.0, fade_out_time=0.8, centered=False, italic=False):
+    zorder 200
+    modal True
+
+    $ display_text = "{i}" + text + "{/i}" if italic else text
+
+    key "dismiss" action NullAction()
+    key "rollback" action NullAction()
+    key "skip" action NullAction()
+    key "toggle_skip" action NullAction()
+
+    window:
+        style "window"
+        at cinematic_dialogue_fade_in_out(show_time, fade_out_time)
+
+        if centered:
+            text display_text:
+                style "say_dialogue"
+                xalign 0.5
+                text_align 0.5
+        else:
+            text display_text:
+                style "say_dialogue"
+
+    timer show_time action Return()
+
+label cinematic_narrator(text, show_time=4.0, hide_time=2.0, centered=False, italic=False):
+    $ fade_out_time = min(0.8, show_time)
+    call screen cinematic_dialogue(text, show_time, fade_out_time, centered, italic)
+    $ renpy.pause(hide_time, hard=True)
+    return
+
+transform cinematic_dialogue_fade_in_out(show_time=4.0, fade_out_time=0.8):
+    alpha 0.0
+    yoffset 24
+    ease 0.8 alpha 1.0 yoffset 0
+    pause max(0.0, show_time - 0.8 - fade_out_time)
+    ease fade_out_time alpha 0.0 yoffset 24
+
+transform vignette_fade_in(fade_time=3.0):
+    alpha 0.0
+    linear fade_time alpha 1.0
+
+transform vignette_fade_out(fade_time=3.0):
+    alpha 1.0
+    linear fade_time alpha 0.0
+
+

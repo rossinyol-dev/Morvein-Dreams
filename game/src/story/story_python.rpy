@@ -11,7 +11,7 @@ init python:
     config.layers = [ "background", "master", "transient", "screens", "overlay" ]
     dream_alpha = 0.8
     dream_active = True
-    dream_text_min_limit = 3
+    dream_text_min_limit = 6
     greek_map = {
         "а": "α",
         "е": "ε",
@@ -44,24 +44,30 @@ init python:
         "Х": "Χ",
     }
 
-    def start_dream_effect(finish_nightmare = True):
-        if (finish_nightmare == True):
-            pause_music()
-            renpy.sound.play("audio/fx/horror_bell.mp3")
-            renpy.music.play(
-                "audio/dream_theme.mp3",
-                fadein=2.0
-            )
+    def start_dream_effect():
+        pause_music()
+        renpy.sound.play("audio/fx/horror_bell.mp3")
+        renpy.music.play(
+            "audio/dream_theme.mp3",
+            fadein=2.0
+        )
         renpy.show("black", layer="background")
         renpy.layer_at_list([slow_shaking], layer="master")
 
-    def stop_dream_effect(finish_nightmare = True):
-        if (finish_nightmare == True):
-            renpy.music.stop(fadeout=2.0)
-            resume_music()
+    def start_dream_effect_without_music():
+        renpy.sound.play("audio/fx/horror_bell.mp3")
+        renpy.show("black", layer="background")
+        renpy.layer_at_list([slow_shaking], layer="master")
+
+    def stop_dream_effect():
+        renpy.music.stop(fadeout=2.0)
+        resume_music()
         renpy.layer_at_list([], layer="master")
 
-    def hard_fade(scene_name, delay=3.0, texts = None):
+    def stop_dream_effect_without_music():
+        renpy.layer_at_list([], layer="master")
+
+    def hard_fade(scene_name, delay=3.0, texts = None, show_gui=True, dream=True):
         renpy.stop_skipping()
 
         renpy.hide_screen("say")
@@ -80,14 +86,35 @@ init python:
 
         renpy.pause(0.5, hard=True)
 
-        renpy.show(scene_name, layer="master", at_list=[fade_in_from_black(delay)])
+        if dream:
+            renpy.show(
+                scene_name,
+                what=DynamicDisplayable(dream_scene_dynamic, scene_name),
+                layer="master",
+                at_list=[fade_in_from_black(delay)]
+            )
+        else:
+            renpy.show(scene_name, layer="master", at_list=[fade_in_from_black(delay)])
         renpy.pause(delay, hard=True)
+
+        if show_gui:
+            renpy.show_screen("gui")
         
     def dream_scene_dynamic(st, at, image_name):
         global dream_alpha
 
-        dream_alpha += random.uniform(-0.05, 0.05)
-        dream_alpha = max(0.4, min(0.6, dream_alpha))
+        if globals().get("hero_selected", False):
+            dream_alpha = max(0.0, min(1.0, (hero.aspect - 5) * 0.25))
+        else:
+            dream_alpha = 0.0
+
+        if dream_alpha <= 0.0:
+            return renpy.displayable(image_name), 0.1
+
+        base = renpy.displayable(image_name)
+        purple_alpha = dream_alpha * 0.55
+        red_alpha = dream_alpha * 0.25
+        amber_alpha = dream_alpha * 0.12
 
         d = Composite(
             (1920, 1080),
@@ -97,14 +124,15 @@ init python:
                 alpha=dream_alpha
             )
         )
-
         return d, 0.1
+
+        fade_to_black()
 
     def dream_char(image_name, pos=None, z=10, transition=dissolve):
         if pos is None:
             pos = []
 
-        low_dream_level=3
+        low_dream_level=4
 
         if hero.aspect >= low_dream_level:
             renpy.show(
@@ -201,3 +229,23 @@ init python:
         # Считаем общую паузу на основе переданных ТОБОЙ чисел
         total_pause = fade_time + pause_time
         renpy.pause(total_pause, hard=True)
+
+    def start_act(title, subtitle, act_num, scene):
+        renpy.play("audio/act_start.mp3", "music")
+
+        renpy.hide_screen("gui")
+        renpy.hide_screen("say")
+        renpy.hide_screen("quick_menu")
+
+        renpy.scene(layer="screens")
+        renpy.scene(layer="overlay")
+        renpy.scene(layer="master")
+
+        renpy.show("black", layer="master")
+        renpy.with_statement(fade)
+
+        renpy.take_screenshot()
+        renpy.save("1-[act_num]", "Начало [act_num] акта")
+        renpy.call("show_act_title", title, subtitle)
+
+        return scene

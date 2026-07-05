@@ -32,12 +32,12 @@ screen char_stats():
 
                     text "[hero.name]"
                     text "[hero.prof.value]"
-                    text "[hero_state_desc(hero.state)]"
 
                 vbox:
                     spacing 20
                     yoffset -50
 
+                    text "[hero_state_desc(hero.state)]"
                     text "[stat_desc(hero.mercy, mercy_desc, mercy_colors)]"
                     text "[stat_desc(hero.reason, reason_desc, reason_colors)]"
                     text "[stat_desc(hero.aspect, aspect_desc, aspect_colors)]"
@@ -72,3 +72,38 @@ screen blood_overlay(hero_instance):
     elif hero_instance.state == STATE.GRAVELY:
         add "images/misc/state_gravely.png" matrixcolor SaturationMatrix(1.5) * BrightnessMatrix(-0.3) at blood_flash
         timer 20.0 action [SetField(hero, "state", STATE.DEAD), Jump("hero_died")]
+
+label aspect_threshold_scene(message):
+    hide screen gui
+    with fade
+
+    $ renpy.show("black", zorder=-100)
+
+    $ start_dream_effect_without_music()
+
+    $ old_skip = preferences.skip_unseen
+    $ preferences.skip_unseen = False
+
+    aspect "[message]"
+    aspect "Ты чувствешь слабость..."
+    $ renpy.pause(2.0, hard=True)
+
+    show screen gui(hero)
+    with fade
+
+    $ stop_dream_effect_without_music()
+
+    $ preferences.skip_unseen = old_skip
+
+    $ potion_energy = get_inventory_item("potion_energy")
+    if potion_energy and potion_energy.count > 0:
+        narrator "Зелье бодрости звенит в сумке."
+        narrator "Сейчас было бы разумно выпить его."
+        $ inventory_tutorial_blink = True
+
+    return
+
+label potion_energy_relief:
+    narrator "Ты чувствуешь облегчение."
+
+    return

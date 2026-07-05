@@ -13,6 +13,13 @@ image rykard horror = Transform("images/chars/rykard_horror.png", zoom=0.7)
 image boy horror = Transform("images/chars/boy_horror.png", zoom=0.7)
 image girl horror = Transform("images/chars/girl_horror.png", zoom=0.7)
 image rykard guard unarmed = Transform("images/chars/rykard_guard_unarmed.png", zoom=0.7)
+image rykard guard armed = Transform("images/chars/rykard_guard_armed.png", zoom=0.7)
+image temple guard defalut = Transform("images/chars/temple_guard.png", zoom=0.7)
+image albert default = Transform("images/chars/albert_default.png", zoom=0.7)
+image willem default = Transform("images/chars/willem_default.png", zoom=0.7)
+image gang leader default = Transform("images/chars/gang_leader_default.png", zoom=0.7)
+image mistrel default = Transform("images/chars/minstrel_default.png", zoom=0.7)
+image mistrel horror = Transform("images/chars/minstrel_horror.png", zoom=0.7)
 
 # Персонажи
 define narrator = Character()
@@ -35,6 +42,14 @@ define horror = Character(
     what_color="#f61111",
     what_slow_cps=15
 )
+define aspect = Character(
+    None,
+    what_font="fonts/dream.ttf",
+    what_xalign=0.5,
+    what_text_align=0.5,
+    what_color="#0619c5",
+    what_slow_cps=15
+)
 define beggar = Character('Нищий', color="#7c9703")
 define stefan = Character('Отец Стефан', color="#b02d2d")
 define cultist = Character('Культист', color="#6a4001")
@@ -45,6 +60,9 @@ define agatha = Character('Агата', color="#eb049a")
 define rykard = Character('Рикард фон Триллиан', color="#002b7c")
 define innkeeper = Character('Трактирщик Виллем', color="#084f0c")
 define albert = Character('Альберт', color="#9b6a2f")
+define rykard_guard_armed = Character('Страж Рикарда', color="#6f3b3b")
 define rykard_guard_unarmed = Character('Незнакомец', color="#6f3b3b")
 define gang_leader = Character('Главарь', color="#7a7a7a")
-
+define willem = Character('Виллем', color="#116554")
+define gang_leader = Character('Главарь банды', color="#116554")
+define minstrel_default = Character('Менестрель', color="#d7bc0e")

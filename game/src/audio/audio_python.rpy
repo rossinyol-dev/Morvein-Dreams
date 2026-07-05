@@ -19,3 +19,8 @@ init python:
                 synchro_start=saved_music_pos,
                 fadein=1.0
             )
+
+    def change_music(track, fadeout=3.0, fadein=3.0, channel="music"):
+        renpy.music.stop(channel=channel, fadeout=fadeout)
+        renpy.pause(fadeout, hard=True)
+        renpy.music.play(track, channel=channel, fadein=fadein)

@@ -72,11 +72,11 @@ screen inventory_button():
     fixed:
         xysize (100, 100)
 
-        if inventory_new_item_alert or hero.state in (STATE.INJURED, STATE.GRAVELY):
+        if inventory_new_item_alert or inventory_tutorial_blink or hero.state in (STATE.INJURED, STATE.GRAVELY):
             add Transform(
                 "images/misc/inventory.png",
                 zoom=0.22,
-                matrixcolor=TintMatrix("#ff4800")
+                matrixcolor=TintMatrix("#00ff08")
             ) at inventory_wound_blink:
                 align (0.5, 0.5)
         else:

@@ -74,9 +74,9 @@ screen inventory_overlay():
                 alpha=1.0
             )
 
-            action Hide("inventory_overlay")
-            
-    key "K_ESCAPE" action [Hide("inventory_overlay"), Hide("item_description")]
+            action [SetVariable("inventory_tutorial_blink", False), Hide("inventory_overlay")]
+             
+    key "K_ESCAPE" action [SetVariable("inventory_tutorial_blink", False), Hide("inventory_overlay"), Hide("item_description")]
 
 # Описание предметов
 screen item_description(item, item_x, item_y):
