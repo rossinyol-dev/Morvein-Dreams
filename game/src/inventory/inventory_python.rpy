@@ -15,6 +15,12 @@ init python:
         inventory_items.append(item)
         renpy.store.inventory_new_item_alert = True
 
+    def inventory_item_title(item):
+        return renpy.translation.translate_string(item.title)
+
+    def inventory_item_description(item):
+        return renpy.translation.translate_string(item.description)
+
     def remove_item(item_id):
         for item in inventory_items:
             if item.id == item_id:

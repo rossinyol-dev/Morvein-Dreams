@@ -60,13 +60,13 @@ screen char_choice():
                     xsize 0.9             # Занимает 90% от ширины своей половины экрана
                     spacing 15            # Промежуток между элементами (заменяет пустую строку)
 
-                    text "Мильтон":
+                    text _("Мильтон"):
                         xalign 0.5        # Имя строго по центру блока
                         size 40           # Крупный шрифт для имени
                         color "#fff"
                         outlines [ (2, "#000", 0, 0) ]
 
-                    text "Бывший монах Ордена. Служил в храме Морвейна много лет, прежде чем покинуть его. Годы служения сделали его черствым к людским слабостям, а увиденные странности стали проникать в его сновидения.":
+                    text _("Бывший монах Ордена. Служил в храме Морвейна много лет, прежде чем покинуть его. Годы служения сделали его черствым к людским слабостям, а увиденные странности стали проникать в его сновидения."):
                         xalign 0.0        # Описание начинается слева
                         text_align 0.0    # Выравнивание строк длинного текста по левому краю
                         size 30           # Шрифт для описания чуть меньше
@@ -91,13 +91,13 @@ screen char_choice():
                     xsize 0.9             # Занимает 90% от ширины своей половины экрана
                     spacing 15            # Промежуток между элементами (заменяет пустую строку)
 
-                    text "Фальк":
+                    text _("Фальк"):
                         xalign 0.5        # Имя строго по центру блока
                         size 40
                         color "#fff"
                         outlines [ (2, "#000", 0, 0) ]
 
-                    text "Блестящий столичный лекарь. Попал в немилость из-за смерти влиятельного горожанина. Оказался в Морвейне совсем недавно, но уже заслужил уважение местных. Милосерден и крайне рационален, в происходящем в Морвейне пытается найти научное объяснение.":
+                    text _("Блестящий столичный лекарь. Попал в немилость из-за смерти влиятельного горожанина. Оказался в Морвейне совсем недавно, но уже заслужил уважение местных. Милосерден и крайне рационален, в происходящем в Морвейне пытается найти научное объяснение."):
                         xalign 0.0        # Описание начинается слева
                         text_align 0.0    # Выравнивание строк длинного текста по левому краю
                         size 30
@@ -164,7 +164,7 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts
 
     python:
         for text in texts_start:
-            dream(text)
+            dream(renpy.translation.translate_string(text))
             renpy.pause(2.0, hard=True)
 
     if texts_horror:
@@ -174,13 +174,13 @@ label dream_scene(texts_start = [], horror_char = None, texts_horror = [], texts
 
         python:
             for text in texts_horror:
-                horror(text)
+                horror(renpy.translation.translate_string(text))
                 renpy.pause(2.0, hard=True)
 
     if texts_end:
         python:
             for text in texts_end:
-                dream(text)
+                dream(renpy.translation.translate_string(text))
                 renpy.pause(2.0, hard=True)
 
     hide horror_character
@@ -316,7 +316,7 @@ screen cinematic_dialogue(text, show_time=4.0, fade_out_time=0.8, centered=False
 
 label cinematic_narrator(text, show_time=4.0, hide_time=2.0, centered=False, italic=False):
     $ fade_out_time = min(0.8, show_time)
-    call screen cinematic_dialogue(text, show_time, fade_out_time, centered, italic)
+    call screen cinematic_dialogue(renpy.translation.translate_string(text), show_time, fade_out_time, centered, italic)
     $ renpy.pause(hide_time, hard=True)
     return
 

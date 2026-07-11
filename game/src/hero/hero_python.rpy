@@ -192,7 +192,16 @@ init python:
         else:
             idx = 4
 
-        return "{color=%s}%s{/color}" % (color_table[idx], text_table[idx])
+        return "{color=%s}%s{/color}" % (color_table[idx], renpy.translation.translate_string(text_table[idx]))
+
+    def hero_display_name(hero):
+        return renpy.translation.translate_string(hero.name)
+
+    def hero_display_full_name(hero):
+        return renpy.translation.translate_string(hero.full_name)
+
+    def hero_display_prof(hero):
+        return renpy.translation.translate_string(hero.prof.value)
 
     def hero_state_color(state):
         colors = {
@@ -212,7 +221,7 @@ init python:
             STATE.DEAD: "Ты мертв.",
         }
 
-        return descriptions.get(state, getattr(state, "value", str(state)))
+        return renpy.translation.translate_string(descriptions.get(state, getattr(state, "value", str(state))))
 
     def hero_state_colored_desc(state):
         return "{color=%s}%s{/color}" % (hero_state_color(state), hero_state_desc(state))

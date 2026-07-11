@@ -50,7 +50,7 @@ screen inventory_overlay():
                                 add Transform(inv_item.icon, zoom=0.14):
                                     align (0.5, 0.5)
 
-                                text "[inv_item.title] (x[inv_item.count])":
+                                text "[inventory_item_title(inv_item)] (x[inv_item.count])":
                                     yoffset 20
                                     xalign 0.5
                                     ypos 150
@@ -92,12 +92,12 @@ screen item_description(item, item_x, item_y):
         vbox:
             spacing 10
 
-            text item.title:
+            text inventory_item_title(item):
                 font "fonts/char.ttf"
                 size 30
                 color "#b4531c"
 
-            text item.description:
+            text inventory_item_description(item):
                 font "fonts/char.ttf"
                 size 30
                 color "#e6d2aa"
@@ -133,7 +133,7 @@ label read_new_book(texts = None, preview_image_path = None, action = None):
 
     python:
         for text in texts:
-            renpy.say("narrator", text)
+            renpy.say("narrator", renpy.translation.translate_string(text))
 
     if preview_image_path:
         call screen fullscreen_item_preview(preview_image_path)

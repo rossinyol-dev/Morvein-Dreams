@@ -30,8 +30,8 @@ screen char_stats():
                     spacing 20
                     yoffset 20
 
-                    text "[hero.name]"
-                    text "[hero.prof.value]"
+                    text "[hero_display_name(hero)]"
+                    text "[hero_display_prof(hero)]"
 
                 vbox:
                     spacing 20

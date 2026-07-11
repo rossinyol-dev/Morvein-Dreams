@@ -21,6 +21,7 @@ screen main_menu():
             )
         else:
             textbutton _("Новая игра") action Start()
+        textbutton _("Настройки") action ShowMenu("preferences")
         # textbutton _("Об игре") action ShowMenu("about")
         textbutton _("Выход") action Quit(confirm=not main_menu)
 
