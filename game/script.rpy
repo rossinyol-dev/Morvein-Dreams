@@ -16,6 +16,8 @@ default girl_picture_found_flag = False
 default singer_saved_flag = False
 default hero_saved_by_guard = False
 default choir_notes_found_flag = False
+default go_to_well_today_flag = False
+default archives_explored_flag = False
 
 # Флаги готовности
 default finished_act = False
@@ -24,7 +26,8 @@ default finished_act = False
 label start:
     $ quick_menu = debug and not renpy.variant("web")
     $ _skipping = debug
-    $ _game_menu_screen = None
+    if not debug:
+        $ _game_menu_screen = None
     $ preferences.afm_enable = not debug
     $ preferences.afm_time = 10.0
 

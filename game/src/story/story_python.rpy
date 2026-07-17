@@ -257,8 +257,6 @@ init python:
         renpy.show("black", layer="master")
         renpy.with_statement(fade)
 
-        renpy.take_screenshot()
-        renpy.save("1-[act_num]", "Начало [act_num] акта")
         renpy.call("show_act_title", title, subtitle, act_start_duration)
 
         return scene

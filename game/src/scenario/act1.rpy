@@ -21,22 +21,36 @@ label act_1_hospital_before_start:
     menu:
         "Сколько я уже здесь? И что с отцом Стефаном?":
             mattias "Ты здесь уже пару дней. К счастью, твои раны оказались не слишком серьезными. Через пару дней ты уже полностью поправишься."
-            narrator "Выражение лица Маттиаса мрачнеет."
-            mattias "Что касается отца Стефана — он жив. Но травма очень тяжелая, мы боремся за его жизнь всё это время."
-            mattias "Орден не может позволить себе потерять такого человека, как он."
-            mattias "Всеми делами сейчас временно управляет совет Ордена."
+            if stefan_saved_flag:
+                narrator "Выражение лица Маттиаса немного меняется."
+                mattias "Что касается отца Стефана — он жив и почти полностью оправился от ран."
+                mattias "Мы все должны сказать тебе спасибо, что ты сразу принес его в собор после нападения того безумца."
+                mattias "Кто знает, что бы сейчас было с настоятелем..."
+                mattias "Но благодаря тебе он уже на ногах — и активно руководит советом Ордена."
+            else:
+                narrator "Выражение лица Маттиаса сильно мрачнеет."
+                mattias "Что касается отца Стефана — он жив. Но травма очень тяжелая, мы боремся за его жизнь всё это время."
+                mattias "Орден не может позволить себе потерять такого человека, как он."
+                mattias "Всеми делами сейчас временно управляет совет Ордена."
     
     if hero.prof == PROF.DOCTOR:
         menu:
             "Совет Ордена?":
-                mattias "Да, это группа старших братьев, которые принимают решения в отсутствие отца Стефана."
+                if stefan_saved_flag:
+                    mattias "Да, это группа старших братьев под руководством отца Стефана."
+                else:
+                    mattias "Да, это группа старших братьев, которые принимают решения в отсутствие отца Стефана."
 
     mattias "Им пришлось действовать быстро и решительно, чтобы навести порядок после произошедшего."
     mattias "Десятки людей бесследно исчезли этой ночью."
     mattias "Все выходы из города сейчас закрыты, а на улицах введен комендантский час."
     mattias "И еще одно."
-    mattias "Совет хочет встретиться с тобой. Ведь ты последний, кто видел отца Стефана в сознании."
-    mattias "Возможно, они могут даже подозревать тебя в чем-то..." 
+    if stefan_saved_flag:
+        mattias "Отец Стефан хочет как можно скорее увидеться с тобой."
+        mattias "Он явно хочет обсудить с тобой произошедшее и поблагодарить тебя."
+    else:
+        mattias "Совет хочет встретиться с тобой. Ведь ты последний, кто видел отца Стефана в сознании."
+        mattias "Возможно, они могут даже подозревать тебя в чем-то..." 
     mattias "Впрочем, хватит об этом! Сейчас тебе нужен отдых — продолжим наш разговор позднее."
 
     $ hide_dream_char("mattias default")
@@ -45,7 +59,7 @@ label act_1_hospital_before_start:
 
     call dream_scene(
     [
-        "Ты слышишь колокола и шум прибоя...",
+        "Ты слышишь колокола над головой...",
         "Они звучат все ближе...",
     ],
     "stefan horror",
@@ -106,7 +120,7 @@ label act_1_hospital_before_start:
             narrator "Повсюду снуют братья Ордена с книгами и свитками в руках."
             narrator "Помещение наводнили храмовые стражи: они стоят у алтаря, у выхода и в тени боковых проходов."
             narrator "Неизменным остался лишь хор, который снова поет свою размеренную песню."
-            narrator "Ты чувствуешь, что сам воздух гудит от возникшего в городе напряжения."
+            narrator "Ты чувствуешь, что сам воздух гудит от повсеместного напряжения."
             narrator "Осталось лишь понять, что делать дальше."
             narrator "Пойти ли по горячим следам, попытавшись найти пропавших лунатиков."
             narrator "Либо же, как говорил брат Маттиас, отправиться на встречу с Советом."
@@ -132,13 +146,19 @@ label act_1_start:
             # InvItem("potion_dream", "Зелье сна", "images/misc/potion_dream.png", "Зелье сна", 10),
         ]
 
+    $ renpy.take_screenshot()
+    $ renpy.save("1-1", "Начало 1 акта")
+
     menu:
         "Искать улики в городе":
             $ next_destination = "act_1_investigation_streets"
-        "Отправиться к Совету" if finished_act:
+        "Отправиться к Совету":
             $ next_destination = "act_1_archives_council"
 
     $ next_destination = start_act("АКТ I", "ТАЙНА", 1, next_destination)
+
+    call tutorial_text
+
     jump expression next_destination
 
 ######################################
@@ -147,7 +167,6 @@ label act_1_start:
 
 label act_1_investigation_streets:
     $ change_music("audio/morvein_explore.mp3", fadeout=0.0)
-    call tutorial_text
     $ hard_fade("morvein_streets")
 
     narrator "Через несколько минут ты снова оказываешься на знакомой улице."
@@ -158,7 +177,63 @@ label act_1_investigation_streets:
 
     menu:
         "Отправиться в таверну":
-            jump act_1_investigation_tavern
+            jump act_1_investigation_agatha
+
+label act_1_investigation_agatha:
+    $ hard_fade("morvein_market_square")
+
+    narrator "Ты проходишь через торговую площадь."
+    narrator "Ты видишь Агату"
+
+    $ dream_char("agatha default", [center])
+
+    agatha "Она обращается к тебе."
+
+    menu:
+        "Заговорить с ней":
+            menu:
+                "Схватить ее":
+                    if hero.control > 3:
+                        "Ты хватаешь ее."
+                        $ agatha_arrested_flag = True
+                        jump act_1_archives_agatha_quest_end
+                    else:
+                        "Ты упускаешь ее."
+                "Отпустить ее":
+                    "Ты отпускаешь ее."
+                    $ agatha_release_flag = True
+                    jump act_1_archives_agatha_quest_end
+        "Схватить ее":
+            "Ты упускаешь ее."
+            $ agatha_runaway_flag = True
+            jump act_1_archives_agatha_quest_end
+    
+    narrator "Агата кидает тебе в лицо непонятный порошок и убегает."
+    
+    hide agatha_default with dissolve
+
+    call dream_scene(
+        ["На короткое мгновение у тебя темнеет в глазах"],
+        None,
+        [],
+        [],
+        True)
+
+    narrator "Ты гонишься за ней."
+
+    if hero.aspect >= 3:
+        narrator "Ты видишь скрытый путь."
+        narrator "Ты настигаешь ее."
+
+        menu:
+            "Схватить ее и доставить в собор":
+                $ agatha_arrested_flag = True
+            "Отпустить ее":
+                $ agatha_release_flag = True
+    else:
+        $ agatha_runaway_flag = True
+
+    jump act_1_investigation_tavern
 
 label act_1_investigation_tavern:
     $ hard_fade("morvein_tavern", show_gui=True)
@@ -187,7 +262,7 @@ label act_1_investigation_well_alley:
     $ hard_fade("morvein_well_view")
 
     narrator "На первый взгляд, внутри нет ничего, кроме непроницаемой темноты и запаха затхлой воды."
-    narrator "Ты придвигаешься еще ближе."
+    narrator "Ты придвигаешься еще ближе и замечаешь внизу какой-то странный силуэт."
 
     menu:
         "Посмотреть вниз": 
@@ -206,27 +281,37 @@ label act_1_investigation_well_alley:
             [],
             False)
 
-    if hero.control >= 8:
-        narrator "В последний момент ты приходишь в себя и с ужасом понимаешь: еще секунда — и ты рухнул бы в колодец головой вниз."
+            if hero.control >= 8: 
+                jump act_1_investigation_not_fall_to_well
+            else:
+                jump act_1_investigation_save_from_well
+        "Отстраниться":
+            if hero.control >= 3:
+                jump act_1_investigation_not_fall_to_well
+            else:
+                jump act_1_investigation_save_from_well
 
+label act_1_investigation_not_fall_to_well:
+        narrator "В последний момент ты приходишь в себя и с ужасом понимаешь: еще секунда — и ты рухнул бы в колодец головой вниз."
+        
         $ hard_fade("morvein_well_alley")
 
         narrator "Ты поспешно отшатываешься и садишься на землю, привалившись спиной к каменной кладке."
         narrator "Незнакомца нигде не видно..."
         narrator "Ты поднимаешь глаза и замечаешь перед собой молодого паренька в грязной рубашке. Он глядит на тебя с испугом."
 
-
         $ dream_char("albert default", [center])
 
         albert "Господин, меня послал за вами мастер Виллем. Я Альберт — его помощник."
 
-        $ add_aspect(hero)
+        $ add_aspect(hero, 1)
 
         albert "Мастер сразу почуял неладное, когда вы молча ушли со стеклянным взглядом, даже не расплатившись."
         albert "Вы скверно выглядите, пойдемте обратно. Хозяин о вас позаботится."
 
         jump act_1_investigation_after_well
-    else:
+
+label act_1_investigation_save_from_well:
         $ fade_to_black(fade_time=1.0, pause_time=1.0)
 
         call dream_scene(
@@ -282,7 +367,7 @@ label act_1_investigation_well_alley:
         albert "Вы крайне скверно выглядите, вам срочно нужно обработать раны." 
         albert "Пойдемте обратно. Хозяин о вас позаботится."
 
-    jump act_1_investigation_after_well
+        jump act_1_investigation_after_well
 
 label act_1_investigation_after_well:
     $ hard_fade("morvein_tavern")
@@ -314,14 +399,21 @@ label act_1_investigation_after_well:
 
     menu:
         "Настоять на вылазке сегодня":
+            $ go_to_well_today_flag = True
             narrator "Ты твердо заявляешь, что ждать до утра нельзя — упускать зацепку глупо, надо действовать как можно скорее."
             willem "Эх, упрямый ты человек. Ладно, удерживать не стану, но отправитесь не раньше вечера."
             willem "Альберт пойдет с тобой. Вдруг снова что-то случится."
-            willem "А сейчас — отдыхай! Скоро здесь  будет выступать моя дочь, Эйлин."
-            willem "К счастью, она полностью пошла в мать — и своей красотой, и ангельским голосом."
-            willem "Жаль, что Ида не успела увидеть, как расцвела наша дочь."
-            narrator "Ты видишь, как мастер Виллем незаметно смахивает слезу с глаза."
-            willem "Все, мне надо работать. Альберт, за мной!"
+            willem "А сейчас — отдыхай!"
+        "Согласиться пойти завтра":
+            narrator "Ты соглашаешься, что сейчас идти может быть опасно."
+            willem "Славно. Еще не хватало, чтобы свернул себе шею в темноте."
+            willem "Как раз будет время спокойно послушать вечерний концерт."
+            
+    willem "Скоро здесь  будет выступать моя дочь, Эйлин."    
+    willem "К счастью, она полностью пошла в мать — и своей красотой, и ангельским голосом."
+    willem "Жаль, что Ида не успела увидеть, как расцвела наша дочь."
+    narrator "Ты видишь, как мастер Виллем незаметно смахивает слезу с глаза."
+    willem "Все, мне надо работать. Альберт, за мной!"
 
     $ hide_dream_char("willem default")
 
@@ -394,38 +486,94 @@ label act_1_investigation_tavern_song:
     narrator "Альберт рядом с ним сидит с открытым ртом, смотря на дверь, за которой скрылась Эйлин."
     narrator "Когда он пытается встать на ноги, то ты понимаешь, что паренек сильно пьян и едва держится на ногах."
     narrator "Хозяин таверны, снова повернувшийся к гостям, дает Альберту отеческий подзатыльник и подмигивает тебе."
-    narrator "Кажется, осматривать колодец придется одному..."
-
-    jump act_1_investigation_well_descent
+    
+    if go_to_well_today_flag:
+        narrator "Кажется, осматривать колодец придется одному..."
+        jump act_1_investigation_well_descent
+    else:
+        narrator "Ты отправляешься на боковую."
+        narrator "Альберт идет вместе с тобой."
 
 label act_1_investigation_well_descent:
     $ change_music("audio/well_explore.mp3")
     $ hard_fade("morvein_well_alley")
-    
-    narrator "Ты второй раз за день оказываешься на заднем дворе таверны."
+
+    if go_to_well_today_flag:
+        narrator "Ты второй раз за день оказываешься на заднем дворе таверны."
+    else:
+        narrator "Ты снова оказываешься на заднем дворе таверны."
+
     narrator "Когда ты подходишь к колодцу, то воспоминания о произошедшем заставляют тебя на мгновение вздрогнуть."
     narrator "Глубоко вздохнув, ты крепко привязываешь веревку к вороту и осторожно начинаешь спускаться во тьму."
 
     jump act_1_investigation_inside_well
 
 label act_1_investigation_inside_well:
-    $ hard_fade("morvein_well_inside")
+    $ fade_to_black(3.0, 2.0)
 
     narrator "Оказавшись на самом дне, ты оглядываешься вокруг."
     narrator "Солнечный свет почти не проникает сюда, поэтому поначалу пещера кажется совсем обычной."
-    narrator "Но спустя несколько секунд твой взгляд цепляется за высокую каменную арку, высеченную прямо в стене."
-    narrator "По её контуру едва заметно мерцают странные, почти потухшие символы в виде фаз луны."
-    narrator "Прямо под аркой находится массивная каменная плита. Судя по свежим царапинам на полу, совсем недавно она явно двигалась."
-    narrator "Ты упираешься руками в холодный камень и пытаешься надавить на плиту, но та не поддаётся ни на сантиметр."
-    narrator "Внимательно осмотрев символы на арке, ты приходишь к мысли, что проход, возможно, открывается в определенное время."
-    narrator "Может быть, только ночью. Или же при свете полной луны."
-    narrator "Следом ты кидаешь взгляд вниз и видишь на земле следы нескольких ног, которые обрываются прямо у арки."
-    narrator "Следы совсем новые, будто кто-то проходил здесь день или два назад."
-    narrator "Кажется, безумное предположение, что спящие могли уйти ночью через подземные ходы, может оказаться не таким уж безумным..."
-    narrator "Через пару минут, изучив остальную пещеру, ты понимаешь, что сейчас здесь делать больше нечего. Пора возвращаться."
 
-    jump act_1_investigation_tavern_meeting
+    if go_to_well_today_flag:
+        $ hard_fade("morvein_well_inside_no_door")
 
+        narrator "Спустя несколько секунд ты замечаешь открытый проход в арке, высеченной прямо в стене."
+        narrator "Над аркой ярко горят символы в виде фаз луны."
+    else:
+        $ hard_fade("morvein_well_inside")
+
+        narrator "Спустя несколько секунд твой взгляд цепляется за высокую каменную арку, высеченную прямо в стене."
+        narrator "По её контуру едва заметно мерцают странные, почти потухшие символы в виде фаз луны."
+        narrator "Прямо под аркой находится массивная каменная плита. Судя по свежим царапинам на полу, совсем недавно она явно двигалась."
+        narrator "Ты упираешься руками в холодный камень и пытаешься надавить на плиту, но та не поддаётся ни на сантиметр."
+        narrator "Внимательно осмотрев символы на арке, ты приходишь к мысли, что проход, возможно, открывается в определенное время."
+        narrator "Может быть, только ночью. Или же при свете полной луны."
+        narrator "Следом ты кидаешь взгляд вниз и видишь на земле следы нескольких ног, которые обрываются прямо у арки."
+        narrator "Следы совсем новые, будто кто-то проходил здесь день или два назад."
+        narrator "Кажется, безумное предположение, что спящие могли уйти ночью через подземные ходы, может оказаться не таким уж безумным..."
+        narrator "Через пару минут, изучив остальную пещеру, ты понимаешь, что сейчас здесь делать больше нечего. Пора возвращаться."
+
+        jump act_1_investigation_tavern_meeting
+
+label act_1_investigation_into_archway:
+    narrator "Ты чувствуешь, как что-то по ту сторону арки манит тебя..."
+
+    menu optional_name:
+        "Войти внутрь":
+            narrator "Преодолев внутреннее сопротивление, ты входишь в проход."
+            narrator "................."
+        "Отступить":
+            narrator "Ты впоминаешь проишествие и отступаешь."
+            jump act_1_investigation_tavern_meeting
+
+label act_1_investigation_catacombs_hole:
+    $ fade_to_black(3.0, 2.0)
+
+    narrator "............"
+
+    $ hard_fade("morvein_catacombs_hole")
+
+    narrator "............"
+
+    menu:
+        "Посмотреть в щель":
+            $ hard_fade("morvein_catacombs")
+
+            narrator "......................."
+
+        "Отступить":
+            narrator "......................."
+
+
+    if archives_explored_flag:
+        menu:
+            "Отправиться в таверну":
+                jump act_1_investigation_tavern_meeting
+    else:
+        menu:
+            "Отправиться к совету Ордена":
+                jump act_1_archives_council
+            
 label act_1_investigation_tavern_meeting:
     $ hard_fade("morvein_tavern")
 
@@ -491,24 +639,33 @@ label act_1_archives_council:
     narrator "Ты входишь в зал и спустя пару секунд слышишь за собой грохот закрывающихся тяжелых створок."
 
     $ hard_fade("temple_council")
-    hide temple guard default with dissolve
+    $ hide_dream_char("temple guard defalut")
 
     narrator "Впереди от тебя, за массивным каменным столом, сидят трое старших братьев Ордена."
     narrator "В полумраке их лица кажутся высеченными из серого камня."
     narrator "Несколько мгновений никто не произносит ни слова."
-    narrator "Затем сидящий по центру монах встает и скрипучим голосом обращается к тебе."
+    
+    if stefan_saved_flag:
+        narrator "Затем сидящий по центру отец Стефан встает и сердечно приветствует себя."
 
-    $ dream_char("edmund default", [center])
+        $ dream_char("stefan default", [center])
 
-    edmund "Доброе утро, [hero.full_name], мы вас ждали."
-    edmund "Перейду сразу к делу: вы были последним, кто видел отца Стефана в сознании."
-    edmund "И у нас есть к вам пара вопросов."
-    narrator "Ты рассказываешь Совету о событиях того рокового дня."
-    narrator "О встрече с отцом Стефаном, об исходе спящих, о напавшем на настоятеля нищем."
-    narrator "Старшие братья внимательно слушают тебя, периодически переглядываясь между собой."
-    edmund "Что же, ваши слова звучат убедительно."
-    edmund "Если у нас и были какие-то подозрения, то вы их развеяли."
-    edmund "Возможно, у вас есть какие-то вопросы?"
+        edmund "Доброе утро, [hero.full_name], как я рад вас видеть!"
+        edmund "От лица всего Ордена и лично от себя должен выразить вам благодарность за то, что сижу сейчас здесь."
+    else:
+        narrator "Затем сидящий по центру монах встает и скрипучим голосом обращается к тебе."
+
+        $ dream_char("edmund default", [center])
+
+        edmund "Доброе утро, [hero.full_name], мы вас ждали."
+        edmund "Перейду сразу к делу: вы были последним, кто видел отца Стефана в сознании."
+        edmund "И у нас есть к вам пара вопросов."
+        narrator "Ты рассказываешь Совету о событиях того рокового дня."
+        narrator "О встрече с отцом Стефаном, об исходе спящих, о напавшем на настоятеля нищем."
+        narrator "Старшие братья внимательно слушают тебя, периодически переглядываясь между собой."
+        edmund "Что же, ваши слова звучат убедительно."
+        edmund "Если у нас и были какие-то подозрения, то вы их развеяли."
+        edmund "Возможно, у вас есть какие-то вопросы?"
 
     menu:
         "Узнать о доступе к архивам Ордена":
@@ -543,131 +700,14 @@ label act_1_archives_council:
     
         jump act_1_archives_agatha_quest
 
-label act_1_singer_cell:
-    $ hard_fade("temple_singer_cell")
+label act_1_archives_interrogaton:
+    narrator "..."
 
-    narrator "Герой обследует келью певца."
-    narrator "В келье герой находит спрятанный дневник."
+label act_1_archives_beggar_explore:
+    narrator "..."
 
-    menu:
-        "Прочитать дневник":
-            narrator "Герой читает дневник певца."
-
-    narrator "Из дневника герой узнает, что певцу со временем начало становиться хуже."
-    narrator "В дневнике сказано, что пара его братьев из хора исчезла."
-    narrator "Певец выкрал из секретной секции архива записи о хоре."
-    narrator "Из архивных записей певец узнал, что пропавшие певцы, возможно, находятся под собором."
-
-    $ add_inventory_item(
-        InvItem(
-            "singer_notes",
-            "Записи певца",
-            "images/misc/manuscript.png",
-            "Дневник певца и выкраденные архивные записи о хоре.",
-            1
-        )
-    )
-
-    narrator "Герой забирает дневник и архивные записи."
-
-    jump act_1_before_underground_choir
-
-label act_1_before_underground_choir:
-    $ hard_fade("temple_before_underground_choir")
-
-    narrator "Герой приходит к проходу под собор."
-    narrator "Обычно этот проход охраняется."
-    narrator "Сейчас проход никем не охраняется."
-    narrator "Стража нигде нет."
-    narrator "Герой идет в подземный проход."
-
-    jump act_1_underground_choir
-
-label act_1_underground_choir:
-    $ hard_fade("temple_underground_choir")
-
-    narrator "Герой выходит в подземный зал."
-    narrator "Посреди зала стоят окаменевшие фигуры."
-    narrator "Среди них герой видит пропавшего певца."
-    narrator "У ног певца лежит убитый страж."
-    narrator "Певец плачет."
-    narrator "Певец говорит, что теперь узнал правду."
-    narrator "Певцы хора со временем деревенеют."
-    narrator "После этого их отводят вниз."
-    narrator "Их используют для поддержания резонанса хора."
-    narrator "Со временем певцы каменеют окончательно."
-    narrator "Певец передает герою записи об этом."
-    narrator "Певец говорит, что для него всё кончено."
-
-    $ add_inventory_item(
-        InvItem(
-            "choir_resonance_notes",
-            "Вырванные страницы хроники",
-            "images/misc/manuscript.png",
-            "Вырванные страницы о том, что окаменевших певцов используют для поддержания резонанса хора.",
-            1
-        )
-    )
-
-    $ choir_notes_found_flag = True
-
-    if hero.control > 10:
-        $ singer_saved_flag = True
-
-        narrator "Герой замечает, что певец пытается убить себя."
-        narrator "Герой успевает схватить певца."
-        narrator "Герой забирает окровавленный кинжал певца."
-        narrator "Герой отводит певца в Совет."
-    else:
-        $ singer_saved_flag = False
-
-        narrator "Герой слишком поздно понимает, что певец пытается убить себя."
-        narrator "Певец убивает себя."
-        narrator "Герой забирает окровавленный кинжал певца."
-        narrator "Герой несет тело певца в Совет."
-
-    $ add_inventory_item(
-        InvItem(
-            "bloody_dagger",
-            "Окровавленный кинжал",
-            "images/misc/bloody_dagger.png",
-            "Кинжал пропавшего певца, испачканный кровью.",
-            1
-        )
-    )
-
-    jump act_1_singer_found
-
-label act_1_singer_found:
-    $ hard_fade("temple_council_enter")
-
-    if singer_saved_flag:
-        narrator "Герой приводит спасенного певца к Совету."
-    else:
-        narrator "Герой приносит тело певца к Совету."
-
-    $ hard_fade("temple_council")
-
-    if singer_saved_flag:
-        narrator "Совет благодарит героя."
-        narrator "Совет говорит, что позаботится о послушнике."
-    else:
-        narrator "Совет сокрушенно вздыхает."
-        narrator "Совет просит оставить тело."
-        narrator "Совет говорит, что тело заберут."
-
-    menu:
-        "Отдать вырванные страницы хроники и кинжал":
-            narrator "Герой отдает Совету вырванные страницы хроники и окровавленный кинжал."
-            $ remove_item("choir_resonance_notes")
-            $ remove_item("bloody_dagger")
-
-        "Оставить страницы и кинжал себе":
-            narrator "Герой оставляет вырванные страницы хроники и окровавленный кинжал себе."
-
-    narrator "Совет говорит герою, что теперь он может идти в архив."
-
-    jump act_1_archives_explore
+label act_1_archives_quest_ended:
+    narrator "..."
 
 label act_1_archives_explore:
     $ hard_fade("temple_archives")
@@ -841,76 +881,131 @@ label act_1_archives_explore:
         "Искать улики на улице" if not (trillian_seal_found_flag or order_history_explored_flag):
             jump act_1_investigation_streets
 
-label act_1_archives_agatha_quest:
-    $ hard_fade("morvein_streets")
+label act_1_singer_cell:
+    $ hard_fade("temple_singer_cell")
 
-    narrator "Ты идешь к тайному месту."
-    narrator "Ты видишь Агату"
-
-    $ dream_char("agatha default", [center])
-
-    agatha "Она обращается к тебе."
+    narrator "Герой обследует келью певца."
+    narrator "В келье герой находит спрятанный дневник."
 
     menu:
-        "Заговорить с ней":
-            menu:
-                "Схватить ее":
-                    if hero.control > 3:
-                        "Ты хватаешь ее."
-                        $ agatha_arrested_flag = True
-                        jump act_1_archives_agatha_quest_end
-                    else:
-                        "Ты упускаешь ее."
-                "Отпустить ее":
-                    "Ты отпускаешь ее."
-                    $ agatha_release_flag = True
-                    jump act_1_archives_agatha_quest_end
-        "Схватить ее":
-            "Ты упускаешь ее."
-            $ agatha_runaway_flag = True
-            jump act_1_archives_agatha_quest_end
-    
-    narrator "Агата кидает тебе в лицо непонятный порошок и убегает."
-    
-    hide agatha_default with dissolve
+        "Прочитать дневник":
+            narrator "Герой читает дневник певца."
 
-    call dream_scene(
-        ["На короткое мгновение у тебя темнеет в глазах"],
-        None,
-        [],
-        [],
-        True)
+    narrator "Из дневника герой узнает, что певцу со временем начало становиться хуже."
+    narrator "В дневнике сказано, что пара его братьев из хора исчезла."
+    narrator "Певец выкрал из секретной секции архива записи о хоре."
+    narrator "Из архивных записей певец узнал, что пропавшие певцы, возможно, находятся под собором."
 
-    narrator "Ты гонишься за ней."
+    $ add_inventory_item(
+        InvItem(
+            "singer_notes",
+            "Записи певца",
+            "images/misc/manuscript.png",
+            "Дневник певца и выкраденные архивные записи о хоре.",
+            1
+        )
+    )
 
-    if hero.aspect >= 3:
-        narrator "Ты видишь скрытый путь."
-        narrator "Ты настигаешь ее."
+    narrator "Герой забирает дневник и архивные записи."
 
-        menu:
-            "Схватить ее и доставить в собор":
-                $ agatha_arrested_flag = True
-            "Отпустить ее":
-                $ agatha_release_flag = True
+    jump act_1_before_underground_choir
+
+label act_1_before_underground_choir:
+    $ hard_fade("temple_before_underground_choir")
+
+    narrator "Герой приходит к проходу под собор."
+    narrator "Обычно этот проход охраняется."
+    narrator "Сейчас проход никем не охраняется."
+    narrator "Стража нигде нет."
+    narrator "Герой идет в подземный проход."
+
+    jump act_1_underground_choir
+
+label act_1_underground_choir:
+    $ hard_fade("temple_underground_choir")
+
+    narrator "Герой выходит в подземный зал."
+    narrator "Посреди зала стоят окаменевшие фигуры."
+    narrator "Среди них герой видит пропавшего певца."
+    narrator "У ног певца лежит убитый страж."
+    narrator "Певец плачет."
+    narrator "Певец говорит, что теперь узнал правду."
+    narrator "Певцы хора со временем деревенеют."
+    narrator "После этого их отводят вниз."
+    narrator "Их используют для поддержания резонанса хора."
+    narrator "Со временем певцы каменеют окончательно."
+    narrator "Певец передает герою записи об этом."
+    narrator "Певец говорит, что для него всё кончено."
+
+    $ add_inventory_item(
+        InvItem(
+            "choir_resonance_notes",
+            "Вырванные страницы хроники",
+            "images/misc/manuscript.png",
+            "Вырванные страницы о том, что окаменевших певцов используют для поддержания резонанса хора.",
+            1
+        )
+    )
+
+    $ choir_notes_found_flag = True
+
+    if hero.control > 10:
+        $ singer_saved_flag = True
+
+        narrator "Герой замечает, что певец пытается убить себя."
+        narrator "Герой успевает схватить певца."
+        narrator "Герой забирает окровавленный кинжал певца."
+        narrator "Герой отводит певца в Совет."
     else:
-        $ agatha_runaway_flag = True
+        $ singer_saved_flag = False
 
-    jump act_1_archives_agatha_quest_end
+        narrator "Герой слишком поздно понимает, что певец пытается убить себя."
+        narrator "Певец убивает себя."
+        narrator "Герой забирает окровавленный кинжал певца."
+        narrator "Герой несет тело певца в Совет."
 
-label act_1_archives_agatha_quest_end:
-    scene temple_council
-    with fade
+    $ add_inventory_item(
+        InvItem(
+            "bloody_dagger",
+            "Окровавленный кинжал",
+            "images/misc/bloody_dagger.png",
+            "Кинжал пропавшего певца, испачканный кровью.",
+            1
+        )
+    )
 
-    show edmund default at center
-    with dissolve
+    jump act_1_singer_found
 
-    if agatha_arrested_flag:
-        edmund "Мы довольны, го в архив"
-        jump act_1_archives_explore
+label act_1_singer_found:
+    $ hard_fade("temple_council_enter")
+
+    if singer_saved_flag:
+        narrator "Герой приводит спасенного певца к Совету."
     else:
-        edmund "Мы разочарованы"
-        narrator "Придется начать собственное расследование"
-        jump act_1_investigation_streets
+        narrator "Герой приносит тело певца к Совету."
+
+    $ hard_fade("temple_council")
+
+    if singer_saved_flag:
+        narrator "Совет благодарит героя."
+        narrator "Совет говорит, что позаботится о послушнике."
+    else:
+        narrator "Совет сокрушенно вздыхает."
+        narrator "Совет просит оставить тело."
+        narrator "Совет говорит, что тело заберут."
+
+    menu:
+        "Отдать вырванные страницы хроники и кинжал":
+            narrator "Герой отдает Совету вырванные страницы хроники и окровавленный кинжал."
+            $ remove_item("choir_resonance_notes")
+            $ remove_item("bloody_dagger")
+
+        "Оставить страницы и кинжал себе":
+            narrator "Герой оставляет вырванные страницы хроники и окровавленный кинжал себе."
+
+    narrator "Совет говорит герою, что теперь он может идти в архив."
+
+    jump act_1_archives_explore
 
 ######################################
 ########## ПУТЬ К РИКАРДУ ############
