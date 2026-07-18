@@ -1,4 +1,7 @@
-﻿# Первый акт
+﻿###################
+### ПЕРВЫЙ АКТ ####
+###################
+
 label act_1_hospital_before_start:
     play music "hospital.mp3" fadein 5.0
 
@@ -21,6 +24,7 @@ label act_1_hospital_before_start:
     menu:
         "Сколько я уже здесь? И что с отцом Стефаном?":
             mattias "Ты здесь уже пару дней. К счастью, твои раны оказались не слишком серьезными. Через пару дней ты уже полностью поправишься."
+            
             if stefan_saved_flag:
                 narrator "Выражение лица Маттиаса немного меняется."
                 mattias "Что касается отца Стефана — он жив и почти полностью оправился от ран."
@@ -72,7 +76,7 @@ label act_1_hospital_before_start:
     [],
     False)
     
-    $ add_aspect(hero)
+    $ add_aspect(hero, 1)
 
     $ hard_fade("temple_bed_view", 5.0, show_gui=False)
 
@@ -96,7 +100,7 @@ label act_1_hospital_before_start:
         mattias "Сам знаешь, как Орден дорожит этими эликсирами."
     elif(hero.prof == PROF.DOCTOR):
         mattias "Используй его с умом. Орден обычно не раздает эти эликсиры никому, кроме самих братьев."
-    mattias "Такими темпами придется раздавать их всем жителям города..."
+    mattias "Если так пойдет дальше, то придется раздавать их всем жителям города..."
     narrator "В воздухе повисает долгое молчание, сопровождаемое лишь дыханием твоего собеседника."
     narrator "Ты чувствуешь, что сознание снова начинает покидать тебя."
     narrator "Маттиас, заметив это, беззвучно отступает от кровати и выходит за дверь."
@@ -133,7 +137,7 @@ label act_1_start:
         $ inventory_items = [
             InvItem("coins", "Золото", "images/misc/coins.png", "Золотая марка Морвейна. Причина людского раздора во все времена.", 100),
             InvItem("potion_hp", "Зелье исцеления", "images/misc/potion.png", "Колба с мерцающей красной жидкостью внутри. Исцеляет даже самые тяжелые раны.", 1),
-            InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_energy.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 2),
+            InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_dream.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 2),
             # InvItem("potion_poison", "Яд", "images/misc/potion_poison.png", "Яд", 10),
             # InvItem("potion_dream", "Зелье сна", "images/misc/potion_dream.png", "Зелье сна", 10),
         ]
@@ -141,7 +145,7 @@ label act_1_start:
         $ inventory_items = [
             InvItem("coins", "Золото", "images/misc/coins.png", "Золотая марка Морвейна. Причина людского раздора во все времена.", 300),
             InvItem("potion_hp", "Зелье исцеления", "images/misc/potion.png", "Колба с мерцающей красной жидкостью внутри. Исцеляет даже самые тяжелые раны.", 2),
-            InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_energy.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 1),
+            InvItem("potion_energy", "Зелье бодрости", "images/misc/potion_dream.png", "Редкое зелье, изготавливаемое алхимиками Ордена из черного вереска. Выпей - и кошмары отступят.", 1),
             # InvItem("potion_poison", "Яд", "images/misc/potion_poison.png", "Яд", 10),
             # InvItem("potion_dream", "Зелье сна", "images/misc/potion_dream.png", "Зелье сна", 10),
         ]
@@ -157,7 +161,7 @@ label act_1_start:
 
     $ next_destination = start_act("АКТ I", "ТАЙНА", 1, next_destination)
 
-    call tutorial_text
+    # call tutorial_text
 
     jump expression next_destination
 
@@ -166,8 +170,8 @@ label act_1_start:
 ######################################
 
 label act_1_investigation_streets:
-    $ change_music("audio/morvein_explore.mp3", fadeout=0.0)
-    $ hard_fade("morvein_streets")
+    $ change_music("audio/morvein_explore.mp3", fadeout=3.0)
+    $ hard_fade("morvein_streets", delay=3.0)
 
     narrator "Через несколько минут ты снова оказываешься на знакомой улице."
     narrator "Остановившись под навесом старой лавки, ты размышляешь, с чего начать расследование."
@@ -182,58 +186,41 @@ label act_1_investigation_streets:
 label act_1_investigation_agatha:
     $ hard_fade("morvein_market_square")
 
-    narrator "Ты проходишь через торговую площадь."
-    narrator "Ты видишь Агату"
+    narrator "По пути к таверне ты проходишь через небольшую торговую площадь."
+    narrator "Над тесными рядами палаток то и дело вспыхивают голоса покупателей и отчаянно спорящих с ними за цену уличных торговцев."
+    narrator "Кто-то продаёт связки сушёных трав, кто-то выкладывает на ткань дешёвые амулеты, а у дальнейго ряда, под выцветшим навесом, стоит столик с аккуратно расставленными флаконами."
+    narrator "За ним хлопочет незнакомая торговка: невысокая, бойкая, в красной шали и платке, повязанном на голову."
 
     $ dream_char("agatha default", [center])
 
-    agatha "Она обращается к тебе."
+    narrator "Заметив твой взгляд, она отвечает улыбкой человека, который уже решил, что ты уйдёшь отсюда с покупкой."
+    agatha_unknown "Эй, красавчик! Вижу по походке: силы на исходе, а день ещё длинный."
+    agatha_unknown "Милости просим — подходи, не бойся! Микстуры целебные да зелья бодрости ценные — купишь все, что душеньке твоей угодно."
+    narrator "Она ловко поднимает один из флаконов к свету, и густая фиолетовая жидкость внутри будто на миг вспыхивает изнутри."
+    agatha_unknown "Один глоток — и ноги сами понесут тебя дальше. Для долгой дороги, для работы, для тех случаев, когда сон совсем не вовремя."
 
     menu:
         "Заговорить с ней":
-            menu:
-                "Схватить ее":
-                    if hero.control > 3:
-                        "Ты хватаешь ее."
-                        $ agatha_arrested_flag = True
-                        jump act_1_archives_agatha_quest_end
-                    else:
-                        "Ты упускаешь ее."
-                "Отпустить ее":
-                    "Ты отпускаешь ее."
-                    $ agatha_release_flag = True
-                    jump act_1_archives_agatha_quest_end
-        "Схватить ее":
-            "Ты упускаешь ее."
-            $ agatha_runaway_flag = True
-            jump act_1_archives_agatha_quest_end
-    
-    narrator "Агата кидает тебе в лицо непонятный порошок и убегает."
-    
-    hide agatha_default with dissolve
+            narrator "Ты подходишь к прилавку торговки, осматривая лежащие на нем травы и зелья в мутных склянках."
+            
+            if hero.prof == PROF.MONK: 
+                narrator "Она, разглядев тебя поближе, резко меняется в лице."
+                narrator "По ее потухшей улыбке ты понимаешь, что меньше всего сейчас она рада обществу монаха Ордена."
+                agatha "Добрый день, славный господин! Чем Агата вам может быть полезна?"
+                narrator "Ты замечаешь, как она пытается незаметно убрать лежащее в руке зелье под прилавок."
 
-    call dream_scene(
-        ["На короткое мгновение у тебя темнеет в глазах"],
-        None,
-        [],
-        [],
-        True)
-
-    narrator "Ты гонишься за ней."
-
-    if hero.aspect >= 3:
-        narrator "Ты видишь скрытый путь."
-        narrator "Ты настигаешь ее."
-
-        menu:
-            "Схватить ее и доставить в собор":
-                $ agatha_arrested_flag = True
-            "Отпустить ее":
-                $ agatha_release_flag = True
-    else:
-        $ agatha_runaway_flag = True
-
-    jump act_1_investigation_tavern
+                menu:
+                    "Выхватить флакон":
+                        narrator "Ты выхватываешь из рук Агаты зелье с фиолетовой жидкостью."
+                        narrator "В ее ыглазах мгновенно вспыхиывает возмущение, которое она, впрочем, не решается высказать."
+                        narrator "Ты осматриваешь вырванную из рук склянку и с легкостью опознаешь подделку."
+                        narrator "У орденских эликсиров всегда есть особая сургучная печать, которой нет на этой склянке."
+            else:
+                narrator "Торговка продолжает тебе широко улыбаться"
+        "Пойти дальше":
+            narrator "Ты игнорируешь ее настойчивые зазывания и отправляешься прямиком в таверну."
+            narrator "Нет времени отвлекаться на каждого уличного торговца."
+            jump act_1_investigation_tavern
 
 label act_1_investigation_tavern:
     $ hard_fade("morvein_tavern", show_gui=True)
@@ -629,8 +616,8 @@ label act_1_investigation_tavern_meeting:
 ######################################
 
 label act_1_archives_council:
-    $ change_music("audio/temple_council.mp3")
-    $ hard_fade("temple_council_enter")
+    $ change_music("audio/temple_council.mp3", fadeout=0.0)
+    $ hard_fade("temple_council_enter", delay=1.0)
 
     $ dream_char("temple guard defalut", [center])
 
@@ -872,14 +859,7 @@ label act_1_archives_explore:
 
     $ hide_dream_char("cornelius default")
 
-    narrator "Настало время продолжить расследование."
-
-    menu:
-        "Отправиться к усадьбе Триллианов" if trillian_seal_found_flag or order_history_explored_flag:
-            jump act_1_rykard_gang_counter
-
-        "Искать улики на улице" if not (trillian_seal_found_flag or order_history_explored_flag):
-            jump act_1_investigation_streets
+    jump act_1_singer_cell
 
 label act_1_singer_cell:
     $ hard_fade("temple_singer_cell")

@@ -230,7 +230,7 @@ init python:
         total_pause = fade_time + pause_time
         renpy.pause(total_pause, hard=True)
 
-    def audio_duration(track, fallback=3.8):
+    def audio_duration(track, fallback=13.27):
         try:
             duration = renpy.music.get_duration(track)
             if duration:
@@ -244,8 +244,6 @@ init python:
         act_start_track = "audio/act_start.mp3"
         act_start_duration = audio_duration(act_start_track)
 
-        renpy.music.play(act_start_track, channel="music", loop=False)
-
         renpy.hide_screen("gui")
         renpy.hide_screen("say")
         renpy.hide_screen("quick_menu")
@@ -256,6 +254,8 @@ init python:
 
         renpy.show("black", layer="master")
         renpy.with_statement(fade)
+
+        renpy.music.play(act_start_track, channel="music", loop=False)
 
         renpy.call("show_act_title", title, subtitle, act_start_duration)
 
