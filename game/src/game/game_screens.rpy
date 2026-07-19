@@ -24,8 +24,51 @@ screen main_menu():
         if debug and renpy.list_saved_games(fast=True):
             textbutton _("Загрузить") action ShowMenu("load")
         textbutton _("Настройки") action ShowMenu("preferences")
-        # textbutton _("Об игре") action ShowMenu("about")
         textbutton _("Выход") action Quit(confirm=not main_menu)
 
     fixed:
         style_prefix "main_menu"
+
+# Настройки
+screen preferences():
+    tag menu
+
+    vbox:
+        xpos 0.3
+        ypos 0.8
+        style_prefix "navigation"
+        spacing 15
+
+        textbutton _("Сохранить") action Return()
+
+    vbox:
+        xpos 0.3
+        ypos 0.2
+        spacing 15
+
+        style_prefix "radio"
+        label _("Язык")
+        textbutton "Русский" action Language(None)
+        textbutton "English" action Language("english")
+
+    vbox:
+        xpos 0.3
+        ypos 0.5
+        spacing 15
+        
+        if config.has_music:
+            label _("Громкость музыки")
+            hbox:
+                bar value Preference("music volume")
+
+        if config.has_sound:
+            label _("Громкость звуков")
+            hbox:
+                bar value Preference("sound volume")
+
+        if config.has_music or config.has_sound or config.has_voice:
+            null height gui.pref_spacing
+
+            textbutton _("Без звука"):
+                action Preference("all mute", "toggle")
+                style "mute_all_button"

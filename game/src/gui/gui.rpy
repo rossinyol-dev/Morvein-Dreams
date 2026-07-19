@@ -19,29 +19,22 @@ screen journal_button():
             hover Transform("images/misc/journal.png", zoom=0.20, alpha=1.0)
 
             align (0.5, 0.5)
-            # action Show("journal_overlay")
-            action Show("journal_tbd_modal")
+            action Show("glossary_overlay")
 
-# TBD
-screen journal_tbd_modal():
-    modal True
-    zorder 200
+        if glossary_unread_count() > 0:
+            frame:
+                xpos 58
+                ypos 74
+                xysize (50, 50)
+                background Solid("#8f1f13")
+                padding (0, 0)
 
-    button:
-        background Solid("#000000AA")
-        xfill True
-        yfill True
-        action Hide("journal_tbd_modal")
-
-    frame:
-        align (0.5, 0.5)
-        background "#000000DD"
-        padding (40, 30)
-
-        text "Раздел в разработке":
-            font "fonts/char.ttf"
-            size 36
-            color "#e6d2aa"
+                text "[glossary_unread_count()]":
+                    align (0.5, 0.5)
+                    font "fonts/char.ttf"
+                    size 36
+                    color "#f2dfb8"
+                    text_align 0.5
 
 # Кнопка персонажа
 screen char_button:

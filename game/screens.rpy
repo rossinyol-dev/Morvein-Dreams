@@ -729,34 +729,6 @@ style slot_button_text:
 ##
 ## https://www.renpy.org/doc/html/screen_special.html#preferences
 
-screen preferences():
-
-    tag menu
-
-    if main_menu:
-        add "images/bg/_main_menu.png" xsize 1920 ysize 1080
-    else:
-        add gui.game_menu_background
-
-    vbox:
-        xpos 0.06
-        ypos 0.4
-        style_prefix "navigation"
-        spacing 15
-
-        textbutton _("Вернуться") action Return()
-
-    vbox:
-        xpos 0.28
-        ypos 0.4
-        spacing 15
-
-        style_prefix "radio"
-        label _("Язык")
-        textbutton "Русский" action Language(None)
-        textbutton "English" action Language("english")
-
-
 style pref_label is gui_label
 style pref_label_text is gui_label_text
 style pref_vbox is vbox

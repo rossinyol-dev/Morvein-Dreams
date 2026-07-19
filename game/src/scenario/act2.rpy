@@ -3,7 +3,6 @@
 label act_2_rykard_house:
     call show_act_title("АКТ II", "ЗОВ")
 
-
     $ hard_fade("trillian_drawing_room")
 
     $ dream_char("rykard default", [center])
